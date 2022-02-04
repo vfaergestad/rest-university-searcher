@@ -1,4 +1,4 @@
-package university_search
+package constants
 
 const (
 	PORT              = "8080"
