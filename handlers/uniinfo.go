@@ -4,6 +4,7 @@ import (
 	"assignment-1/constants"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 )
@@ -13,7 +14,7 @@ func HandlerUniInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)
 	}
 
-	requestUniInfo(r)
+	universities := requestUniInfo(r)
 
 }
 
@@ -40,8 +41,12 @@ func requestUniInfo(r *http.Request) []University {
 	}
 
 	decoder := json.NewDecoder(res.Body)
+	var universities []University
+	if err := decoder.Decode(&universities); err != nil {
+		log.Fatal(err)
+	}
 
-	return
+	return universities
 
 	//url := constants.UNIVERSITIESAPI_URL + "search"
 
