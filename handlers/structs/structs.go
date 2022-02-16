@@ -28,7 +28,6 @@ type Country struct {
 	Languages map[string]string      `json:"languages"`
 	Maps      map[string]string      `json:"maps"`
 	Borders   []string               `json:"borders"`
-	CCA2      string                 `json:"cca2"`
 }
 
 func CombineUniCountry(u University, c Country) UniAndCountry {
