@@ -1,54 +1,16 @@
 package requests
 
 import (
-	"assignment-1/constants"
 	"assignment-1/handlers/structs"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"path"
 	"strings"
 )
 
-func GetUniCountryInfo(r *http.Request) []structs.UniAndCountry {
-	search := path.Base(r.URL.Path)
-	if search == "" {
-		return nil
-	}
-	query := "search?name=" + search
-	url := constants.UNIVERSITIESAPI_URL + query
-
-	universities := RequestUniInfo(url)
-	if universities == nil {
-		return nil
-	}
-
-	return getCombined(universities)
-
-}
-
-func getCombined(universities []structs.University) []structs.UniAndCountry {
-	var uniInfos []structs.UniAndCountry
-	for _, u := range universities {
-		url := fmt.Sprintf("%sname/%s?fields=languages,maps", constants.COUNTRIESAPI_URL, u.Country)
-		c := RequestCountryInfo(url)
-		uniInfo := structs.UniAndCountry{
-			Name:      u.Name,
-			Country:   u.Country,
-			Isocode:   u.AlphaTwoCode,
-			Webpages:  u.WebPages,
-			Languages: c.Languages,
-			Map:       c.Maps["openStreetMaps"],
-		}
-		uniInfos = append(uniInfos, uniInfo)
-
-	}
-	return uniInfos
-}
-
 func RequestUniInfo(url string) []structs.University {
-	fmt.Println(url)
+	//fmt.Println(url)
 	r, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Errorf("Error in creating University request: %e", err.Error())
@@ -76,7 +38,7 @@ func RequestUniInfo(url string) []structs.University {
 }
 
 func RequestCountryInfo(url string) structs.Country {
-	fmt.Println(url)
+	//fmt.Println(url)
 
 	var alphaSearch bool
 	urlParts := strings.Split(url, "/")
