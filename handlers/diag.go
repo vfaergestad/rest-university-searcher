@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"assignment-1/constants"
+	"assignment-1/handlers/structs"
 	"assignment-1/uptime"
 	"encoding/json"
 	"fmt"
@@ -15,7 +16,7 @@ func HandlerDiag(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	diagnose := getDiagnose()
+	diagnose := requestDiagnose()
 
 	w.Header().Add("content-type", "application/json")
 
@@ -29,7 +30,7 @@ func HandlerDiag(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getDiagnose() Diagnose {
+func requestDiagnose() structs.Diagnose {
 
 	url := constants.UNIVERSITIESAPI_URL
 	universityApiRequest, err := http.NewRequest(http.MethodHead, url, nil)
@@ -38,7 +39,7 @@ func getDiagnose() Diagnose {
 	}
 	universityApiRequest.Header.Add("content-type", "application/json")
 
-	url = constants.COUNTRIESAPI_URL
+	url = constants.COUNTRIESAPI_URL + "all"
 	countriesApiRequest, err := http.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
 		fmt.Errorf("Error in creating country API request: %e", err.Error())
@@ -59,7 +60,7 @@ func getDiagnose() Diagnose {
 
 	countriesApiStatus := res.StatusCode
 
-	return Diagnose{
+	return structs.Diagnose{
 		UniversitiesApi: fmt.Sprintf("%d", universityApiStatus),
 		CountriesApi:    fmt.Sprintf("%d", countriesApiStatus),
 		Version:         "v1",

@@ -1,12 +1,9 @@
 package handlers
 
 import (
-	"assignment-1/constants"
+	"assignment-1/handlers/requests"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
-	"path"
 )
 
 func HandlerUniInfo(w http.ResponseWriter, r *http.Request) {
@@ -14,40 +11,17 @@ func HandlerUniInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)
 	}
 
-	universities := requestUniInfo(r)
+	uniInfo := requests.GetUniCountryInfo(r)
+	if uniInfo == nil {
+		http.Error(w, "No universities found", http.StatusNoContent)
+	}
+	w.Header().Add("content-type", "application/json")
+	encoder := json.NewEncoder(w)
 
-}
-
-func requestUniInfo(r *http.Request) []University {
-
-	search := path.Base(r.URL.Path)
-	query := "search?name=" + search
-	url := constants.UNIVERSITIESAPI_URL + query
-
-	r, err := http.NewRequest(http.MethodGet, url, nil)
+	err := encoder.Encode(uniInfo)
 	if err != nil {
-		fmt.Errorf("Error in creating University request: %e", err.Error())
+		http.Error(w, "Error during encoding", http.StatusInternalServerError)
+		return
 	}
-
-	r.Header.Add("content-type", "application/json")
-	client := &http.Client{}
-	res, err := client.Do(r)
-	if err != nil {
-		fmt.Errorf("Error in university response: %e", err.Error())
-	}
-
-	if res.StatusCode != 200 {
-		fmt.Errorf("Status code returned from universityAPI: %d", res.StatusCode)
-	}
-
-	decoder := json.NewDecoder(res.Body)
-	var universities []University
-	if err := decoder.Decode(&universities); err != nil {
-		log.Fatal(err)
-	}
-
-	return universities
-
-	//url := constants.UNIVERSITIESAPI_URL + "search"
 
 }
