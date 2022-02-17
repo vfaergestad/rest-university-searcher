@@ -21,11 +21,15 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 	countryQuery := pathList[len(pathList)-2]
 	uniQuery := pathList[len(pathList)-1]
 	var limit int
-	if l, err := strconv.Atoi(r.URL.Query()["limit"][0]); err != nil || l < 0 {
-		http.Error(w, "The limit is not a valid positive integer. Using 0 as limit.", http.StatusBadRequest)
-		limit = 0
+	if r.URL.Query()["limit"] != nil {
+		if l, err := strconv.Atoi(r.URL.Query()["limit"][0]); err != nil || l < 0 {
+			http.Error(w, "The limit is not a valid positive integer. Using 0 as limit.", http.StatusBadRequest)
+			limit = 0
+		} else {
+			limit = l
+		}
 	} else {
-		limit = l
+		limit = 0
 	}
 
 	var countries []structs.Country
