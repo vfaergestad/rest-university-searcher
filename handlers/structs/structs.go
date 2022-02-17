@@ -8,12 +8,12 @@ type Diagnose struct {
 }
 
 type UniAndCountry struct {
-	Name      string            `json:"name"`
-	Country   string            `json:"country"`
-	Isocode   string            `json:"isocode"`
-	Webpages  []string          `json:"webpages"`
-	Languages map[string]string `json:"languages"`
-	Map       string            `json:"map"`
+	Name      string            `json:"name,omitempty"`
+	Country   string            `json:"country,omitempty"`
+	Isocode   string            `json:"isocode,omitempty"`
+	WebPages  []string          `json:"webpages,omitempty"`
+	Languages map[string]string `json:"languages,omitempty"`
+	Map       string            `json:"map,omitempty"`
 }
 
 type University struct {
@@ -30,14 +30,39 @@ type Country struct {
 	Borders   []string               `json:"borders"`
 }
 
-func CombineUniCountry(u University, c Country) UniAndCountry {
-	uniInfo := UniAndCountry{
-		Name:      u.Name,
-		Country:   u.Country,
-		Isocode:   u.AlphaTwoCode,
-		Webpages:  u.WebPages,
-		Languages: c.Languages,
-		Map:       c.Maps["openStreetMaps"],
+func CombineUniCountry(u University, c Country, fields ...string) UniAndCountry {
+	var uniInfo UniAndCountry
+	if len(fields) > 0 {
+		for _, f := range fields {
+			if f == "name" {
+				uniInfo.Name = u.Name
+			}
+			if f == "country" {
+				uniInfo.Country = u.Country
+			}
+			if f == "isocode" {
+				uniInfo.Isocode = u.AlphaTwoCode
+			}
+			if f == "webpages" {
+				uniInfo.WebPages = u.WebPages
+			}
+			if f == "languages" {
+				uniInfo.Languages = c.Languages
+			}
+			if f == "map" {
+				uniInfo.Map = c.Maps["openStreetMaps"]
+			}
+
+		}
+	} else {
+		uniInfo = UniAndCountry{
+			Name:      u.Name,
+			Country:   u.Country,
+			Isocode:   u.AlphaTwoCode,
+			WebPages:  u.WebPages,
+			Languages: c.Languages,
+			Map:       c.Maps["openStreetMaps"],
+		}
 	}
 	return uniInfo
 
