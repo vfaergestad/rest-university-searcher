@@ -34,25 +34,25 @@ func CombineUniCountry(u University, c Country, fields ...string) UniAndCountry 
 	var uniInfo UniAndCountry
 	if len(fields) > 0 {
 		for _, f := range fields {
-			if f == "name" {
+			switch f {
+			case "name":
 				uniInfo.Name = u.Name
-			}
-			if f == "country" {
+				fallthrough
+			case "country":
 				uniInfo.Country = u.Country
-			}
-			if f == "isocode" {
+				fallthrough
+			case "isocode":
 				uniInfo.Isocode = u.AlphaTwoCode
-			}
-			if f == "webpages" {
+				fallthrough
+			case "webpages":
 				uniInfo.WebPages = u.WebPages
-			}
-			if f == "languages" {
+				fallthrough
+			case "languages":
 				uniInfo.Languages = c.Languages
-			}
-			if f == "map" {
+				fallthrough
+			case "map":
 				uniInfo.Map = c.Maps["openStreetMaps"]
 			}
-
 		}
 	} else {
 		uniInfo = UniAndCountry{
