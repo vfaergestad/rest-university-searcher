@@ -20,6 +20,14 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 	pathList := strings.Split(r.URL.Path, "/")
 	countryQuery := pathList[len(pathList)-2]
 	uniQuery := pathList[len(pathList)-1]
+
+	var fields []string
+	if r.URL.Query().Get("fields") != "" {
+		fields = strings.Split(r.URL.Query().Get("fields"), ",")
+	} else {
+		fields = nil
+	}
+
 	var limit int
 	if l, err := strconv.Atoi(r.URL.Query()["limit"][0]); err != nil || l < 0 {
 		http.Error(w, "The limit is not a valid positive integer. Using 0 as limit.", http.StatusBadRequest)
@@ -42,7 +50,7 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 		universities := requests.RequestUniInfo(url)
 		for _, u := range universities {
 			if limit == 0 || len(uniInfo) < limit {
-				uniInfo = append(uniInfo, structs.CombineUniCountry(u, c))
+				uniInfo = append(uniInfo, structs.CombineUniCountry(u, c, fields...))
 			} else {
 				break
 			}
