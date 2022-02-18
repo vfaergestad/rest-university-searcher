@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strings"
 )
 
 func HandlerUniInfo(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +64,7 @@ func getCombined(universities []structs.University, fields []string) []structs.U
 	var uniInfos []structs.UniAndCountry
 	for _, u := range universities {
 		url := fmt.Sprintf("%sname/%s?fields=languages,maps", constants.COUNTRIESAPI_URL, u.Country)
-		c,_ := requests.RequestCountryInfo(url)
+		c, _ := requests.RequestCountryInfo(url)
 		uniInfo := structs.CombineUniCountry(u, c, fields...)
 		uniInfos = append(uniInfos, uniInfo)
 
