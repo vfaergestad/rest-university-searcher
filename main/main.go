@@ -17,9 +17,9 @@ func main() {
 		port = constants.PORT
 	}
 
-	http.HandleFunc(constants.UNIINFO_LOC, handlers.HandlerUniInfo)
-	http.HandleFunc(constants.NEIGHBOURUNIS_LOC, handlers.HandlerNeighbourUnis)
-	http.HandleFunc(constants.DIAG_LOC, handlers.HandlerDiag)
+	http.HandleFunc(constants.UNIINFO_PATH, handlers.HandlerUniInfo)
+	http.HandleFunc(constants.NEIGHBOURUNIS_PATH, handlers.HandlerNeighbourUnis)
+	http.HandleFunc(constants.DIAG_PATH, handlers.HandlerDiag)
 
 	// Starting HTTP-server
 	log.Println("Starting server on port " + port + " ...")
