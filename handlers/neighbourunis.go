@@ -32,12 +32,12 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Query()["limit"] != nil {
 		if l, err := strconv.Atoi(r.URL.Query()["limit"][0]); err != nil || l < 0 {
 			http.Error(w, "The limit is not a valid positive integer. Using 0 as limit.", http.StatusBadRequest)
-			limit = 0
+			limit = constants.LIMIT_DEFAULT
 		} else {
 			limit = l
 		}
 	} else {
-		limit = 0
+		limit = constants.LIMIT_DEFAULT
 	}
 
 	country, err := requests.RequestCountryInfo(fmt.Sprintf("%sname/%s?fields=borders", constants.COUNTRIESAPI_URL, countryQuery))
