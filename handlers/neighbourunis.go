@@ -32,18 +32,24 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 		limit = 0
 	}
 
+	country, err := requests.RequestCountryInfo(fmt.Sprintf("%sname/%s?fields=borders", constants.COUNTRIESAPI_URL, countryQuery))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	var countries []structs.Country
-	country := requests.RequestCountryInfo(fmt.Sprintf("%sname/%s?borders", constants.COUNTRIESAPI_URL, countryQuery))
 	for _, bor := range country.Borders {
 		url := fmt.Sprintf("%salpha/%s?fields=name,languages,maps", constants.COUNTRIESAPI_URL, bor)
-		countries = append(countries, requests.RequestCountryInfo(url))
+		c, _ := requests.RequestCountryInfo(url)
+		countries = append(countries, c)
 	}
 
 	var uniInfo []structs.UniAndCountry
 	for _, c := range countries {
 		query := fmt.Sprintf("search?name=%s&country=%s", uniQuery, c.Name["common"].(string))
 		url := constants.UNIVERSITIESAPI_URL + query
-		universities := requests.RequestUniInfo(url)
+		universities, _ := requests.RequestUniInfo(url)
 		for _, u := range universities {
 			if limit == 0 || len(uniInfo) < limit {
 				uniInfo = append(uniInfo, structs.CombineUniCountry(u, c))
@@ -62,7 +68,7 @@ func HandlerNeighbourUnis(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 	encoder := json.NewEncoder(w)
 
-	err := encoder.Encode(uniInfo)
+	err = encoder.Encode(uniInfo)
 	if err != nil {
 		http.Error(w, "Error during encoding", http.StatusInternalServerError)
 		return

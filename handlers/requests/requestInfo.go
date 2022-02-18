@@ -3,41 +3,42 @@ package requests
 import (
 	"assignment-1/handlers/structs"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 )
 
-func RequestUniInfo(url string) []structs.University {
+func RequestUniInfo(url string) ([]structs.University, error) {
 	//fmt.Println(url)
 	r, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Errorf("Error in creating University request: %e", err.Error())
+		return []structs.University{}, err
 	}
 
 	r.Header.Add("content-type", "application/json")
 	client := &http.Client{}
 	res, err := client.Do(r)
-	if err != nil {
-		fmt.Errorf("Error in university response: %e", err.Error())
-	}
 
-	if res.StatusCode != 200 {
-		fmt.Errorf("Status code returned from universityAPI: %d", res.StatusCode)
+	switch {
+	case res.StatusCode == http.StatusNotFound:
+		return []structs.University{}, errors.New(fmt.Sprintf("%d University not found", res.StatusCode))
+	case res.StatusCode != http.StatusOK:
+		return []structs.University{}, errors.New(fmt.Sprintf("Status code returned from universityAPI: %d", res.StatusCode))
 	}
 
 	decoder := json.NewDecoder(res.Body)
 	var universities []structs.University
 	if err := decoder.Decode(&universities); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
-	return universities
+	return universities, nil
 
 }
 
-func RequestCountryInfo(url string) structs.Country {
+func RequestCountryInfo(url string) (structs.Country, error) {
 	//fmt.Println(url)
 
 	var alphaSearch bool
@@ -50,7 +51,7 @@ func RequestCountryInfo(url string) structs.Country {
 
 	r, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Errorf("Error in creating country request: %e", err.Error())
+		return structs.Country{}, err
 	}
 
 	r.Header.Add("content-type", "application/json")
@@ -58,7 +59,14 @@ func RequestCountryInfo(url string) structs.Country {
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
-		fmt.Errorf("Error in country response: %e", err.Error())
+		return structs.Country{}, err
+	}
+
+	switch {
+	case res.StatusCode == http.StatusNotFound:
+		return structs.Country{}, errors.New(fmt.Sprintf("%d Country not found", res.StatusCode))
+	case res.StatusCode != http.StatusOK:
+		return structs.Country{}, errors.New(fmt.Sprintf("Status code returned from countryAPI: %d", res.StatusCode))
 	}
 
 	decoder := json.NewDecoder(res.Body)
@@ -68,13 +76,13 @@ func RequestCountryInfo(url string) structs.Country {
 			log.Fatal(err)
 		}
 
-		return country
+		return country, nil
 	} else {
 		var country []structs.Country
 		if err := decoder.Decode(&country); err != nil {
 			log.Fatal(err)
 		}
 
-		return country[0]
+		return country[0], nil
 	}
 }

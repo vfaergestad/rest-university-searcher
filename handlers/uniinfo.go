@@ -17,7 +17,7 @@ func HandlerUniInfo(w http.ResponseWriter, r *http.Request) {
 
 	uniInfo := getUniCountryInfo(r)
 	if uniInfo == nil {
-		http.Error(w, "No universities found", http.StatusNoContent)
+		http.Error(w, "No universities found", http.StatusNotFound)
 	}
 	w.Header().Add("content-type", "application/json")
 	encoder := json.NewEncoder(w)
@@ -38,7 +38,7 @@ func getUniCountryInfo(r *http.Request) []structs.UniAndCountry {
 	query := "search?name=" + search
 	url := constants.UNIVERSITIESAPI_URL + query
 
-	universities := requests.RequestUniInfo(url)
+	universities, _ := requests.RequestUniInfo(url)
 	if universities == nil {
 		return nil
 	}
@@ -51,7 +51,7 @@ func getCombined(universities []structs.University) []structs.UniAndCountry {
 	var uniInfos []structs.UniAndCountry
 	for _, u := range universities {
 		url := fmt.Sprintf("%sname/%s?fields=languages,maps", constants.COUNTRIESAPI_URL, u.Country)
-		c := requests.RequestCountryInfo(url)
+		c, _ := requests.RequestCountryInfo(url)
 		uniInfo := structs.CombineUniCountry(u, c)
 		uniInfos = append(uniInfos, uniInfo)
 
