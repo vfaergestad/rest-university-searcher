@@ -17,6 +17,7 @@ func main() {
 		port = constants.PORT
 	}
 
+	http.HandleFunc(constants.DEFAULT_PATH, handlers.HandlerDefault)
 	http.HandleFunc(constants.UNIINFO_PATH, handlers.HandlerUniInfo)
 	http.HandleFunc(constants.NEIGHBOURUNIS_PATH, handlers.HandlerNeighbourUnis)
 	http.HandleFunc(constants.DIAG_PATH, handlers.HandlerDiag)

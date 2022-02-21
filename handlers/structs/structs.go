@@ -37,19 +37,19 @@ func CombineUniCountry(u University, c Country, fields ...string) UniAndCountry 
 			switch f {
 			case "name":
 				uniInfo.Name = u.Name
-				fallthrough
+				
 			case "country":
 				uniInfo.Country = u.Country
-				fallthrough
+
 			case "isocode":
 				uniInfo.Isocode = u.AlphaTwoCode
-				fallthrough
+
 			case "webpages":
 				uniInfo.WebPages = u.WebPages
-				fallthrough
+
 			case "languages":
 				uniInfo.Languages = c.Languages
-				fallthrough
+
 			case "map":
 				uniInfo.Map = c.Maps["openStreetMaps"]
 			}
