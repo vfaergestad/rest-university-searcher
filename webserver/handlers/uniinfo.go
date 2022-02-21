@@ -1,11 +1,10 @@
 package handlers
 
 import (
-	"assignment-1/constants"
-	"assignment-1/handlers/requests"
-	"assignment-1/handlers/structs"
+	"assignment-1/structs"
+	"assignment-1/webserver/requests/country"
+	"assignment-1/webserver/requests/university"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -48,10 +47,9 @@ func getUniInfo(r *http.Request) []structs.University {
 	if search == "" {
 		return nil
 	}
-	query := "search?name=" + search
-	url := constants.UNIVERSITIESAPI_URL + query
 
-	universities, _ := requests.RequestUniInfo(url)
+	universities, _ := university.RequestUniversity(search)
+
 	if universities == nil {
 		return nil
 	}
@@ -63,8 +61,7 @@ func getUniInfo(r *http.Request) []structs.University {
 func getCombined(universities []structs.University, fields []string) []structs.UniAndCountry {
 	var uniInfos []structs.UniAndCountry
 	for _, u := range universities {
-		url := fmt.Sprintf("%sname/%s?fields=languages,maps", constants.COUNTRIESAPI_URL, u.Country)
-		c, _ := requests.RequestCountryInfo(url)
+		c, _ := country.GetCountryByName(u.Country)
 		uniInfo := structs.CombineUniCountry(u, c, fields...)
 		uniInfos = append(uniInfos, uniInfo)
 

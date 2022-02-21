@@ -28,6 +28,7 @@ type Country struct {
 	Languages map[string]string      `json:"languages"`
 	Maps      map[string]string      `json:"maps"`
 	Borders   []string               `json:"borders"`
+	Alpha     string                 `json:"cca3"`
 }
 
 func CombineUniCountry(u University, c Country, fields ...string) UniAndCountry {
@@ -37,7 +38,7 @@ func CombineUniCountry(u University, c Country, fields ...string) UniAndCountry 
 			switch f {
 			case "name":
 				uniInfo.Name = u.Name
-				
+
 			case "country":
 				uniInfo.Country = u.Country
 

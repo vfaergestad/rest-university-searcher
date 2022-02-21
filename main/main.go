@@ -2,8 +2,8 @@ package main
 
 import (
 	"assignment-1/constants"
-	"assignment-1/handlers"
 	"assignment-1/uptime"
+	"assignment-1/webserver/handlers"
 	"log"
 	"net/http"
 	"os"
