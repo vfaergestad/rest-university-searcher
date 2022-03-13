@@ -3,6 +3,8 @@ package webserver
 import (
 	"assignment-2/internal/constants"
 	"assignment-2/internal/webserver/handlers"
+	"assignment-2/internal/webserver/uptime"
+	"log"
 	"net/http"
 )
 
@@ -14,5 +16,10 @@ func InitServer() {
 	http.HandleFunc(constants.POLICY_PATH, handlers.HandlerPolicy)
 	http.HandleFunc(constants.STATUS_PATH, handlers.HandlerStatus)
 	http.HandleFunc(constants.NOTIFICATIONS_PATH, handlers.HandlerNotifications)
+
+	// Starting HTTP-server
+	log.Println("Starting server on port " + constants.DEFAULT_PORT + " ...")
+	uptime.Init()
+	log.Fatal(http.ListenAndServe(":"+constants.DEFAULT_PORT, nil))
 
 }
