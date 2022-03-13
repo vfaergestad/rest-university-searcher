@@ -9,4 +9,6 @@ const (
 	POLICY_PATH        = "/corona/v1/policy/"
 	STATUS_PATH        = "/corona/v1/status/"
 	NOTIFICATIONS_PATH = "/corona/v1/notifications/"
+
+	POLICY_API_URL = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
 )
