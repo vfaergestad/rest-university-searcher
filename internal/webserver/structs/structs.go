@@ -7,8 +7,3 @@ type Status struct {
 	Version   string `json:"version"`
 	Uptime    string `json:"uptime"`
 }
-
-type PolicyApiResponse struct {
-	PolicyActions  []interface{}          `json:"policyActions"`
-	StringencyData map[string]interface{} `json:"stringencyData"`
-}
