@@ -55,7 +55,7 @@ func checkDate(year string, month string, day string) (bool, error) {
 	}
 
 	// Checks if given month is a valid month.
-	match, err = regexp.MatchString(constants.YEAR_REGEX, month)
+	match, err = regexp.MatchString(constants.MONTH_REGEX, month)
 	if err != nil {
 		return false, err
 	} else if !match {

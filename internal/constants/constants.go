@@ -10,7 +10,7 @@ const (
 	STATUS_PATH        = "/corona/v1/status/"
 	NOTIFICATIONS_PATH = "/corona/v1/notifications/"
 
-	POLICY_API_URL = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
+	POLICY_API_URL = "https://covidtrackerapi.bsg.ox.ac.uk/api/"
 
 	/*
 		// Got from: https://stackoverflow.com/questions/41085409/country-code-validation-with-iso
