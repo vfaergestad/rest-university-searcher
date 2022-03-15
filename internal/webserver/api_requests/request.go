@@ -1,7 +1,7 @@
 package api_requests
 
 import (
-	"assignment-2/internal/constants"
+	"assignment-2/internal/webserver/constants"
 	"errors"
 	"net/http"
 )
