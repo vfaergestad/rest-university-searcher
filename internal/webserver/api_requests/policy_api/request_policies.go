@@ -1,9 +1,9 @@
 package policy_api
 
 import (
-	"assignment-2/internal/constants"
 	"assignment-2/internal/webserver/api_requests"
-	"assignment-2/internal/webserver/json_utility"
+	"assignment-2/internal/webserver/constants"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,10 +14,9 @@ const (
 	POLICY_API_STATUS_URL = "https://covidtrackerapi.bsg.ox.ac.uk/api/"
 	POLICY_API_URL        = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
 
-	ALPHA_CODE_REGEX = "/^[a-z]|[A-Z]{3}$/"
-	YEAR_REGEX       = "/^(2019|202\\d)$/"
-	MONTH_REGEX      = "/^(0[1-9]|1[012])$/"
-	DAY_REGEX        = "/^(0[1-9]|[12]\\d|3[01])$/"
+	YEAR_REGEX  = "^(2019|202\\d)$"
+	MONTH_REGEX = "^(0[1-9]|1[012])$"
+	DAY_REGEX   = "^(0[1-9]|[12]\\d|3[01])$"
 
 	/*
 		// Got from: https://stackoverflow.com/questions/41085409/country-code-validation-with-iso
@@ -33,7 +32,7 @@ const (
 
 )
 
-type PolicyApiResponse struct {
+type policyApiResponse struct {
 	PolicyActions  []interface{}          `json:"policyActions"`
 	StringencyData map[string]interface{} `json:"stringencyData"`
 }
@@ -49,34 +48,64 @@ func GetStatusCode() (int, error) {
 
 }
 
-func GetResponse(alphaCode string, year string, month string, day string) (PolicyApiResponse, error) {
-	// Checks if given alpha-code is a three letter string.
-	match, err := regexp.MatchString(ALPHA_CODE_REGEX, alphaCode)
+func GetStringencyAndPolicies(alphaCode string, year string, month string, day string) (float64, int, error) {
+	policyResponse, err := getResponse(alphaCode, year, month, day)
 	if err != nil {
-		return PolicyApiResponse{}, err
+		return -1, -1, err
+	}
+
+	var stringency float64
+	stringencyRaw := policyResponse.StringencyData["stringency_actual"]
+	if stringencyRaw != nil {
+		stringency = policyResponse.StringencyData["stringency_actual"].(float64)
+		if stringency == 0 {
+			stringency = policyResponse.StringencyData["stringency"].(float64)
+		}
+	} else {
+		stringency = -1
+	}
+
+	policies := len(policyResponse.PolicyActions)
+	if policies < 2 {
+		policies = 0
+	}
+	return stringency, policies, nil
+}
+
+// GetResponse
+// Possible custom-error-messages:
+// 					- MALFORMED_ALPHACODE_ERROR
+//					- MALFORMED_COVID_YEAR_ERROR
+//					- MALFORMED_MONTH_ERROR
+//					- MALFORMED_DAY_ERROR
+func getResponse(alphaCode string, year string, month string, day string) (policyApiResponse, error) {
+	// Checks if given alpha-code is a three letter string.
+	match, err := regexp.MatchString(constants.ALPHA_CODE_REGEX, alphaCode)
+	if err != nil {
+		return policyApiResponse{}, err
 	} else if !match {
-		return PolicyApiResponse{}, errors.New(constants.MALFORMED_ALPHACODE_ERROR)
+		return policyApiResponse{}, errors.New(constants.MALFORMED_ALPHACODE_ERROR)
 	}
 
 	// Check if given date is valid.
 	_, err = checkDate(year, month, day)
 	if err != nil {
-		return PolicyApiResponse{}, err
+		return policyApiResponse{}, err
 	}
 
 	// Create URL and request response from API
 	url := fmt.Sprintf("%s%s/%s-%s-%s", POLICY_API_URL, alphaCode, year, month, day)
 	res, err := api_requests.DoRequest(url, http.MethodGet)
 	if err != nil {
-		return PolicyApiResponse{}, err
+		return policyApiResponse{}, err
 	}
 
-	policy, err := json_utility.DecodeResponse(res, PolicyApiResponse{})
+	policy, err := decodePolicy(res, policyApiResponse{})
 	if err != nil {
-		return PolicyApiResponse{}, err
+		return policyApiResponse{}, err
 	}
 
-	return policy.(PolicyApiResponse), nil
+	return policy, nil
 
 }
 
@@ -106,4 +135,12 @@ func checkDate(year string, month string, day string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func decodePolicy(res *http.Response, target policyApiResponse) (policyApiResponse, error) {
+	decoder := json.NewDecoder(res.Body)
+	if err := decoder.Decode(&target); err != nil {
+		return policyApiResponse{}, err
+	}
+	return target, nil
 }
