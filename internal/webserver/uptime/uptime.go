@@ -4,7 +4,9 @@ package uptime
 
 // File that includes the startTime variable, and the functions acting upon it
 
-import "time"
+import (
+	"time"
+)
 
 // The start time of the server
 var startTime time.Time
@@ -14,7 +16,11 @@ func Init() {
 	startTime = time.Now()
 }
 
-// GetUptime returns the time in seconds since the last restart
-func GetUptime() int {
+// GetUptimeInSeconds returns the time in seconds since the last restart
+func GetUptimeInSeconds() int {
 	return int(time.Since(startTime).Seconds())
+}
+
+func GetUptimeString() string {
+	return time.Since(startTime).String()
 }
