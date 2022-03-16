@@ -30,7 +30,8 @@ func DoRequest(url string, method string) (*http.Response, error) {
 		}
 
 		return res, nil
+	default:
+		return nil, errors.New(constants.InvalidMethodError)
 	}
-	return nil, errors.New(constants.InvalidMethodError)
 
 }
