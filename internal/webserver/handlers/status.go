@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/api_requests/policy_api"
 	"assignment-2/internal/webserver/json_utility"
 	"assignment-2/internal/webserver/uptime"
@@ -30,10 +31,16 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	countryStatus, err := countries_api.GetStatusCode()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := statusResponse{
 		CasesApi:   0,
 		PolicyApi:  policyStatus,
-		CountryApi: 0,
+		CountryApi: countryStatus,
 		Webhooks:   0,
 		Version:    "v1",
 		Uptime:     uptime.GetUptimeString(),
