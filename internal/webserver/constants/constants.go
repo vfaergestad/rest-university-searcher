@@ -11,4 +11,5 @@ const (
 	YearRegex      = "^(2019|202\\d)$"
 	MonthRegex     = "^(0[1-9]|1[012])$"
 	DayRegex       = "^(0[1-9]|[12]\\d|3[01])$"
+	NoNumbersRegex = "^([^0-9]*)$"
 )
