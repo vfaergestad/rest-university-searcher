@@ -29,14 +29,15 @@ func GetStatusCode() (int, error) {
 
 // GetCountryName
 // Possible custom errors:
-// 		- MalformedAlphacodeError
+// 		- MalformedAlphaCodeError
+//		- CountryNotFoundError
 func GetCountryName(alphaCode string) (string, error) {
 	// Checks if given alpha-code is a three letter string.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, alphaCode)
 	if err != nil {
 		return "", err
 	} else if !match {
-		return "", errors.New(constants.MalformedAlphacodeError)
+		return "", errors.New(constants.MalformedAlphaCodeError)
 	}
 
 	url := fmt.Sprintf("%salpha/%s?fields=name", countryAPIUrl, alphaCode)

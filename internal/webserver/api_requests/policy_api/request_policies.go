@@ -67,7 +67,7 @@ func getResponse(alphaCode string, year string, month string, day string) (polic
 	if err != nil {
 		return policyApiResponse{}, err
 	} else if !match {
-		return policyApiResponse{}, errors.New(constants.MalformedAlphacodeError)
+		return policyApiResponse{}, errors.New(constants.MalformedAlphaCodeError)
 	}
 
 	// Check if given date is valid.

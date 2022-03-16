@@ -66,7 +66,7 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	stringency, polices, err := policy_api.GetStringencyAndPolicies(countryQuery, year, month, day)
 	if err != nil {
 		switch err.Error() {
-		case constants.MalformedAlphacodeError,
+		case constants.MalformedAlphaCodeError,
 			constants.MalformedCovidYearError,
 			constants.MalformedMonthError,
 			constants.MalformedDayError:

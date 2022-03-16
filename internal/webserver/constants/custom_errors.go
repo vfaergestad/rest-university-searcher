@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	MalformedAlphacodeError = "the alpha-code must be 3 letters"
+	MalformedAlphaCodeError = "the alpha-code must be 3 letters"
 	MalformedCovidYearError = "not a valid covid year. Must be between 2019 and 2030"
 	MalformedMonthError     = "not a valid month. Must be between 01 and 12"
 	MalformedDayError       = "not a valid day. Must be between 01 and 31"
@@ -30,6 +30,12 @@ func GetNotValidPathError() error {
 
 func GetBadPoliciesRequestError() error {
 	return errors.New(fmt.Sprintf("Not a valid request. Format: /corona/v1/policy/{:country_name}{?scope=YYYY-MM-DD}\n"+
+		"\n"+
+		"%s", getDocumentationError().Error()))
+}
+
+func GetBadCasesRequestError() error {
+	return errors.New(fmt.Sprintf("Not a valid request. Format: /corona/v1/cases/{:country_name}\n"+
 		"\n"+
 		"%s", getDocumentationError().Error()))
 }
