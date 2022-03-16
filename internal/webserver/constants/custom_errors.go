@@ -8,7 +8,7 @@ import (
 const (
 	MalformedAlphacodeError = "the alpha-code must be 3 letters"
 	MalformedCovidYearError = "not a valid covid year. Must be between 2019 and 2030"
-	MalformedMonthError     = "not a valid month. Must be between 01 and 12 / 1 and 12"
+	MalformedMonthError     = "not a valid month. Must be between 01 and 12"
 	MalformedDayError       = "not a valid day. Must be between 01 and 31"
 	InvalidMethodError      = "not a valid http method"
 	CountryNotFoundError    = "country not found"
