@@ -12,17 +12,17 @@ const (
 	DEFAULT_PORT = "8080"
 
 	// The paths that will be handled by each handler
-	DEFAULT_PATH = "/corona/"
+
 )
 
 func InitServer() {
 
 	// Points the different URL-paths to the correct handler
-	http.HandleFunc(DEFAULT_PATH, handlers.HandlerDefault)
-	http.HandleFunc(constants.CASES_PATH, handlers.HandlerCases)
-	http.HandleFunc(constants.POLICY_PATH, handlers.HandlerPolicy)
-	http.HandleFunc(constants.STATUS_PATH, handlers.HandlerStatus)
-	http.HandleFunc(constants.NOTIFICATIONS_PATH, handlers.HandlerNotifications)
+	http.HandleFunc(constants.DefaultPath, handlers.HandlerDefault)
+	http.HandleFunc(constants.CasesPath, handlers.HandlerCases)
+	http.HandleFunc(constants.PolicyPath, handlers.HandlerPolicy)
+	http.HandleFunc(constants.StatusPath, handlers.HandlerStatus)
+	http.HandleFunc(constants.NotificationsPath, handlers.HandlerNotifications)
 
 	// Starting HTTP-server
 	log.Println("Starting server on port " + DEFAULT_PORT + " ...")

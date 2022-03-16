@@ -1,10 +1,14 @@
 package constants
 
 const (
-	CASES_PATH         = "/corona/v1/cases/"
-	POLICY_PATH        = "/corona/v1/policy/"
-	STATUS_PATH        = "/corona/v1/status/"
-	NOTIFICATIONS_PATH = "/corona/v1/notifications/"
+	CasesPath         = "/corona/v1/cases/"
+	PolicyPath        = "/corona/v1/policy/"
+	StatusPath        = "/corona/v1/status/"
+	NotificationsPath = "/corona/v1/notifications/"
+	DefaultPath       = "/corona/"
 
-	ALPHA_CODE_REGEX = "^[a-zA-Z]{3}$"
+	AlphaCodeRegex = "^[a-zA-Z]{3}$"
+	YearRegex      = "^(2019|202\\d)$"
+	MonthRegex     = "^(0[1-9]|1[012])$"
+	DayRegex       = "^(0[1-9]|[12]\\d|3[01])$"
 )

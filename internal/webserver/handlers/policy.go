@@ -66,10 +66,10 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	stringency, polices, err := policy_api.GetStringencyAndPolicies(countryQuery, year, month, day)
 	if err != nil {
 		switch err.Error() {
-		case constants.MALFORMED_ALPHACODE_ERROR,
-			constants.MALFORMED_COVID_YEAR_ERROR,
-			constants.MALFORMED_MONTH_ERROR,
-			constants.MALFORMED_DAY_ERROR:
+		case constants.MalformedAlphacodeError,
+			constants.MalformedCovidYearError,
+			constants.MalformedMonthError,
+			constants.MalformedDayError:
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		default:
