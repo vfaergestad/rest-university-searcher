@@ -16,8 +16,12 @@ const (
 )
 
 type policyApiResponse struct {
-	PolicyActions  []interface{}          `json:"policyActions"`
+	PolicyActions  []policyAction         `json:"policyActions"`
 	StringencyData map[string]interface{} `json:"stringencyData"`
+}
+
+type policyAction struct {
+	PolicyTypeCode string `json:"policy_type_code"`
 }
 
 func GetStatusCode() (int, error) {
@@ -49,8 +53,10 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 	}
 
 	policies := len(policyResponse.PolicyActions)
-	if policies < 2 {
-		policies = 0
+	if policies == 1 {
+		if policyResponse.PolicyActions[0].PolicyTypeCode == "NONE" {
+			policies = 0
+		}
 	}
 	return stringency, policies, nil
 }
