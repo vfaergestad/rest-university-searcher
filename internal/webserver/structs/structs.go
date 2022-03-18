@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type CasesResponse struct {
 	Country    string  `json:"country"`
 	Date       string  `json:"date"`
@@ -7,4 +9,10 @@ type CasesResponse struct {
 	Recovered  int     `json:"recovered"`
 	Deaths     int     `json:"deaths"`
 	GrowthRate float64 `json:"growth_rate"`
+}
+
+type CountryCacheEntry struct {
+	AlphaCode string
+	Name      string
+	Time      time.Time
 }
