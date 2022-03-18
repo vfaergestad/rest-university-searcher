@@ -1,13 +1,10 @@
 package cases_api
 
 import (
-	"assignment-2/internal/webserver/api_requests/countries_api"
-	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
 	"context"
 	"fmt"
 	"github.com/machinebox/graphql"
-	"regexp"
 )
 
 const (
@@ -31,17 +28,12 @@ type mostRecentStruct struct {
 	GrowthRate float64 `json:"growthRate"`
 }
 
-func GetResponse(country string) (structs.CasesResponse, error) {
-	match, err := regexp.MatchString(constants.AlphaCodeRegex, country)
-	if err != nil {
-		return structs.CasesResponse{}, err
-	} else if match {
-		country, err = countries_api.GetCountryName(country)
-		if err != nil {
-			return structs.CasesResponse{}, err
-		}
-	}
+/*
+func GetStatusCode() (int, error) {
 
+}*/
+
+func GetResponse(country string) (structs.CasesResponse, error) {
 	responseStruct, err := getResponse(country)
 	if err != nil {
 		return structs.CasesResponse{}, err

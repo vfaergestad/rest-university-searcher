@@ -12,6 +12,9 @@ const (
 	MalformedDayError       = "not a valid day. Must be between 01 and 31"
 	InvalidMethodError      = "not a valid http method"
 	CountryNotFoundError    = "country not found"
+	CountryAlreadyInCache   = "country already in cache"
+	CountryNotInCache       = "country not in cache"
+	ExpiredCacheEntry       = "cache entry has expired"
 
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )

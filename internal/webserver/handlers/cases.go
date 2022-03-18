@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
+	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/json_utility"
 	"net/http"
@@ -41,6 +42,16 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 
 	countryQuery = strings.Title(countryQuery)
 
+	match, err := regexp.MatchString(constants.AlphaCodeRegex, countryQuery)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if match {
+		country, err = getCountryName(country)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+	}
+
 	// TODO: Improve error-handling
 	casesResponseStruct, err := cases_api.GetResponse(countryQuery)
 	if err != nil {
@@ -54,4 +65,15 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+//TODO: FIX
+func getCountryName(alphaCode string) (string, error) {
+	countryName, err := country_cache.GetCountry(alphaCode)
+	if err != nil {
+		switch err.Error() {
+		case constants.ExpiredCacheEntry:
+
+		}
+	}
 }
