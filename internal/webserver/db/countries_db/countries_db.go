@@ -21,19 +21,27 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 	iter := db.GetClient().Collection(collection).Documents(db.GetContext())
 
 	for {
+		// Gets the next item in the collection
 		doc, err := iter.Next()
+
+		// Stops the loop if there is no more elements
 		if err == iterator.Done {
 			break
 		}
-		dbEmpty = false
 		if err != nil {
 			return nil, err
 		}
-		// Note: You can access the document ID using "doc.Ref.ID"
 
-		// A message map with string keys. Each key is one field, like "text" or "timestamp"
+		dbEmpty = false
+
 		m := doc.Data()
 
+		// Removes the entries that are older than the cache expire limit
+		if time.Since(m["time"].(time.Time)) > constants.CacheExpire {
+			_ = DeleteCountry(m["alphaCode"].(string))
+		}
+
+		// Creates a cache entry struct for each element, and puts it into the result map
 		resultMap[m["alphaCode"].(string)] = structs.CountryCacheEntry{
 			AlphaCode:   m["alphaCode"].(string),
 			CountryName: m["countryName"].(string),
@@ -42,6 +50,7 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 
 	}
 
+	// Return an empty map if the database is empty
 	if dbEmpty {
 		return map[string]structs.CountryCacheEntry{}, errors.New(constants.CountryDBIsEmpty)
 	}

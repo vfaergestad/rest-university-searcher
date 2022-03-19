@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-const cacheExpire = 1200
-
 var cache map[string]structs.CountryCacheEntry
 
 func InitCache() error {
@@ -28,7 +26,7 @@ func InitCache() error {
 
 func GetCountry(alphaCode string) (string, error) {
 	c, exists := cache[alphaCode]
-	if exists && time.Since(c.Time).Hours() < cacheExpire {
+	if exists && time.Since(c.Time).Hours() < constants.CacheExpire {
 		return c.CountryName, nil
 	} else {
 		countryName, err := updateCountry(alphaCode)
