@@ -14,7 +14,8 @@ const (
 	CountryNotFoundError    = "country not found"
 	CountryAlreadyInCache   = "country already in cache"
 	CountryNotInCache       = "country not in cache"
-	ExpiredCacheEntry       = "cache entry has expired"
+	ExpiredCacheEntry       = "cache entry has expired, and has been deleted"
+	CountryDBIsEmpty        = "the country database is empty"
 
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )

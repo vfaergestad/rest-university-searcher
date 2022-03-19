@@ -12,7 +12,7 @@ type CasesResponse struct {
 }
 
 type CountryCacheEntry struct {
-	AlphaCode string
-	Name      string
-	Time      time.Time
+	AlphaCode   string
+	CountryName string
+	Time        time.Time
 }

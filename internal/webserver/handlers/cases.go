@@ -42,13 +42,19 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 
 	countryQuery = strings.Title(countryQuery)
 
-	match, err := regexp.MatchString(constants.AlphaCodeRegex, countryQuery)
+	match, err = regexp.MatchString(constants.AlphaCodeRegex, countryQuery)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if match {
-		country, err = getCountryName(country)
+		countryQuery, err = country_cache.GetCountry(countryQuery)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			switch err.Error() {
+			case constants.CountryNotFoundError:
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			default:
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 		}
 	}
 
@@ -65,15 +71,4 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-}
-
-//TODO: FIX
-func getCountryName(alphaCode string) (string, error) {
-	countryName, err := country_cache.GetCountry(alphaCode)
-	if err != nil {
-		switch err.Error() {
-		case constants.ExpiredCacheEntry:
-
-		}
-	}
 }

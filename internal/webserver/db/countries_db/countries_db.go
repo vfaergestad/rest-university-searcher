@@ -8,20 +8,24 @@ import (
 	"errors"
 	"google.golang.org/api/iterator"
 	"regexp"
+	"strings"
 	"time"
 )
 
 const collection = "countries"
 
 func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
-	var resultMap map[string]structs.CountryCacheEntry
+	resultMap := map[string]structs.CountryCacheEntry{}
+	dbEmpty := true
 
 	iter := db.GetClient().Collection(collection).Documents(db.GetContext())
+
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
 			break
 		}
+		dbEmpty = false
 		if err != nil {
 			return nil, err
 		}
@@ -29,13 +33,19 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 
 		// A message map with string keys. Each key is one field, like "text" or "timestamp"
 		m := doc.Data()
+
 		resultMap[m["alphaCode"].(string)] = structs.CountryCacheEntry{
-			AlphaCode: m["alphaCode"].(string),
-			Name:      m["name"].(string),
-			Time:      m["time"].(time.Time),
+			AlphaCode:   m["alphaCode"].(string),
+			CountryName: m["countryName"].(string),
+			Time:        m["time"].(time.Time),
 		}
 
 	}
+
+	if dbEmpty {
+		return map[string]structs.CountryCacheEntry{}, errors.New(constants.CountryDBIsEmpty)
+	}
+
 	return resultMap, nil
 }
 
@@ -47,7 +57,7 @@ func GetCountry(alphaCode string) (string, error) {
 	}
 
 	m := doc.Data()
-	country, exists := m["name"]
+	country, exists := m["countryName"]
 	if !exists {
 		return "", errors.New(constants.CountryNotFoundError)
 	} else {
@@ -63,6 +73,7 @@ func AddCountry(alphaCode string, countryName string) error {
 		return errors.New(constants.MalformedAlphaCodeError)
 	}
 
+	alphaCode = strings.ToUpper(alphaCode)
 	_, err = db.GetClient().Collection(collection).Doc(alphaCode).Set(db.GetContext(), map[string]interface{}{
 		"alphaCode":   alphaCode,
 		"countryName": countryName,

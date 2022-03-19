@@ -1,6 +1,7 @@
 package country_cache
 
 import (
+	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db/countries_db"
 	"assignment-2/internal/webserver/structs"
@@ -27,19 +28,34 @@ func InitCache() error {
 
 func GetCountry(alphaCode string) (string, error) {
 	c, exists := cache[alphaCode]
-	if exists {
-		if time.Since(c.Time).Hours() < cacheExpire {
-			return c.CountryName, nil
-		} else {
-			_ = removeCountry(alphaCode)
-			return "", errors.New(constants.ExpiredCacheEntry)
-		}
+	if exists && time.Since(c.Time).Hours() < cacheExpire {
+		return c.CountryName, nil
 	} else {
-		return "", errors.New(constants.CountryNotInCache)
+		countryName, err := updateCountry(alphaCode)
+		if err != nil {
+			return "", err
+		}
+		return countryName, nil
 	}
 }
 
-func AddCountry(alphaCode string, countryName string) error {
+func updateCountry(alphaCode string) (string, error) {
+	_ = removeCountry(alphaCode)
+	_ = countries_db.DeleteCountry(alphaCode)
+	countryName, err := countries_api.GetCountryName(alphaCode)
+	if err != nil {
+		if err.Error() == constants.CountryNotFoundError {
+			return "", err
+		}
+	}
+	_ = countries_db.AddCountry(alphaCode, countryName)
+	_ = addCountry(alphaCode, countryName)
+
+	return countryName, nil
+
+}
+
+func addCountry(alphaCode string, countryName string) error {
 	_, exists := cache[alphaCode]
 	if exists {
 		return errors.New(constants.CountryAlreadyInCache)
