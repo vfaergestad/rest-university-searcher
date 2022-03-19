@@ -1,8 +1,10 @@
 package cases_api
 
 import (
+	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/machinebox/graphql"
 )
@@ -76,6 +78,9 @@ func getResponse(country string) (casesApiResponse, error) {
 	var casesResponse casesApiResponse
 	if err := client.Run(ctx, req, &casesResponse); err != nil {
 		fmt.Println(err.Error())
+		if err.Error() == "graphql: Couldn't find data from country "+country {
+			return casesApiResponse{}, errors.New(constants.CountryNotFoundError)
+		}
 		return casesApiResponse{}, err
 	}
 	return casesResponse, nil

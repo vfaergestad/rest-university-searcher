@@ -58,11 +58,15 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO: Improve error-handling
 	casesResponseStruct, err := cases_api.GetResponse(countryQuery)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		if constants.IsBadRequestError(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	err = json_utility.EncodeStruct(w, casesResponseStruct)

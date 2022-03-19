@@ -20,6 +20,21 @@ const (
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )
 
+func IsBadRequestError(err error) bool {
+	switch err.Error() {
+	case MalformedAlphaCodeError,
+		MalformedCovidYearError,
+		MalformedMonthError,
+		MalformedDayError,
+		InvalidMethodError,
+		CountryNotFoundError:
+		return true
+	default:
+		return false
+
+	}
+}
+
 func getDocumentationError() error {
 	return errors.New(fmt.Sprintf("See %s for documentation", linkToDocs))
 }
