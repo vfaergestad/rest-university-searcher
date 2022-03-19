@@ -51,6 +51,9 @@ func GetCountryName(alphaCode string) (string, error) {
 		return "", err
 	}
 
+	if countryStruct.Name["common"] == nil {
+		return "", errors.New(constants.CountryNotFoundError)
+	}
 	countryName := countryStruct.Name["common"].(string)
 	if countryName == "" {
 		return "", errors.New(constants.CountryNotFoundError)
