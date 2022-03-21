@@ -1,12 +1,11 @@
 package cases_api
 
 import (
-	"assignment-2/internal/webserver/constants"
+	"assignment-2/internal/webserver/api_requests"
 	"assignment-2/internal/webserver/structs"
-	"context"
-	"errors"
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/machinebox/graphql"
 )
 
 const (
@@ -53,34 +52,50 @@ func GetResponse(country string) (structs.CasesResponse, error) {
 }
 
 func getResponse(country string) (casesApiResponse, error) {
-	client := graphql.NewClient(casesApiUrl)
-
-	req := graphql.NewRequest(`
-		query ($country: String!) {
-			country(name: $country) {
-				name
-				mostRecent {
-					date(format: "yyyy-MM-dd")
-					confirmed
-					recovered
-					deaths
-					growthRate
+	/*
+		queryString := fmt.Sprintf(`
+			query {
+				country(name: "%s") {
+					name
+					mostRecent {
+						date(format: "yyyy-MM-dd")
+						confirmed
+						recovered
+						deaths
+						growthRate
+					}
 				}
 			}
-		}
-	`)
+		`, country)
+	*/
 
-	req.Var("country", country)
+	queryString := map[string]string{
+		"query": fmt.Sprintf(`
+				{
+				country(name: %s) {
+					name
+					mostRecent {
+						date(format: "yyyy-MM-dd")
+						confirmed
+						recovered
+						deaths
+						growthRate
+					}
+				}
+			}
+		`, country)}
 
-	ctx := context.Background()
-
-	// run it and capture the response
-	var casesResponse casesApiResponse
-	if err := client.Run(ctx, req, &casesResponse); err != nil {
+	queryValue, err := json.Marshal(queryString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	res, err := api_requests.PostRequest(casesApiUrl, bytes.NewBuffer(queryValue))
+	if err != nil {
 		fmt.Println(err.Error())
-		if err.Error() == "graphql: Couldn't find data from country "+country {
-			return casesApiResponse{}, errors.New(constants.CountryNotFoundError)
-		}
+	}
+	var casesResponse casesApiResponse
+	decoder := json.NewDecoder(res.Body)
+	if err := decoder.Decode(&casesResponse); err != nil {
 		return casesApiResponse{}, err
 	}
 	return casesResponse, nil
