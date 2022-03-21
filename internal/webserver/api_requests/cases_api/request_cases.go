@@ -5,6 +5,7 @@ import (
 	"assignment-2/internal/webserver/structs"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"strings"
 )
 
@@ -17,6 +18,10 @@ type queryStruct struct {
 }
 
 type casesApiResponse struct {
+	Data data `json:"data"`
+}
+
+type data struct {
 	Country countryStruct `json:"country"`
 }
 
@@ -46,11 +51,11 @@ func GetResponse(country string) (structs.CasesResponse, error) {
 
 	return structs.CasesResponse{
 		Country:    country,
-		Date:       responseStruct.Country.MostRecent.Date,
-		Confirmed:  responseStruct.Country.MostRecent.Confirmed,
-		Recovered:  responseStruct.Country.MostRecent.Recovered,
-		Deaths:     responseStruct.Country.MostRecent.Deaths,
-		GrowthRate: responseStruct.Country.MostRecent.GrowthRate,
+		Date:       responseStruct.Data.Country.MostRecent.Date,
+		Confirmed:  responseStruct.Data.Country.MostRecent.Confirmed,
+		Recovered:  responseStruct.Data.Country.MostRecent.Recovered,
+		Deaths:     responseStruct.Data.Country.MostRecent.Deaths,
+		GrowthRate: responseStruct.Data.Country.MostRecent.GrowthRate,
 	}, nil
 
 }
@@ -74,27 +79,6 @@ func getResponse(country string) (casesApiResponse, error) {
 
 	query := queryStruct{Query: queryString}
 
-	/*
-		queryString := map[string]string{
-			"query": fmt.Sprintf(`
-					{
-					country(name: %s) {
-						name
-						mostRecent {
-							date(format: "yyyy-MM-dd")
-							confirmed
-							recovered
-							deaths
-							growthRate
-						}
-					}
-			`, country)}
-
-		queryValue, err := json.Marshal(queryString)
-		if err != nil {
-			fmt.Println(err)
-		}*/
-
 	result, err := json.Marshal(query)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -104,9 +88,13 @@ func getResponse(country string) (casesApiResponse, error) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	byteResult, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	var casesResponse casesApiResponse
-	err := json.Unmarshal(res.Body, casesResponse)
-	err = decoder.Decode(&casesResponse)
+	err = json.Unmarshal(byteResult, &casesResponse)
 	if err != nil {
 		return casesApiResponse{}, err
 	}
