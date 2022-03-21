@@ -3,14 +3,18 @@ package cases_api
 import (
 	"assignment-2/internal/webserver/api_requests"
 	"assignment-2/internal/webserver/structs"
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const (
 	casesApiUrl = "https://covid19-graphql.now.sh"
 )
+
+type queryStruct struct {
+	Query string `json:"query"`
+}
 
 type casesApiResponse struct {
 	Country countryStruct `json:"country"`
@@ -52,50 +56,58 @@ func GetResponse(country string) (structs.CasesResponse, error) {
 }
 
 func getResponse(country string) (casesApiResponse, error) {
+
+	queryString := fmt.Sprintf(`
+		query {
+			country(name: "%s") {
+				name
+				mostRecent {
+					date(format: "yyyy-MM-dd")
+					confirmed
+					recovered
+					deaths
+					growthRate
+				}
+			}
+		}
+	`, country)
+
+	query := queryStruct{Query: queryString}
+
 	/*
-		queryString := fmt.Sprintf(`
-			query {
-				country(name: "%s") {
-					name
-					mostRecent {
-						date(format: "yyyy-MM-dd")
-						confirmed
-						recovered
-						deaths
-						growthRate
+		queryString := map[string]string{
+			"query": fmt.Sprintf(`
+					{
+					country(name: %s) {
+						name
+						mostRecent {
+							date(format: "yyyy-MM-dd")
+							confirmed
+							recovered
+							deaths
+							growthRate
+						}
 					}
-				}
-			}
-		`, country)
-	*/
+			`, country)}
 
-	queryString := map[string]string{
-		"query": fmt.Sprintf(`
-				{
-				country(name: %s) {
-					name
-					mostRecent {
-						date(format: "yyyy-MM-dd")
-						confirmed
-						recovered
-						deaths
-						growthRate
-					}
-				}
-			}
-		`, country)}
+		queryValue, err := json.Marshal(queryString)
+		if err != nil {
+			fmt.Println(err)
+		}*/
 
-	queryValue, err := json.Marshal(queryString)
+	result, err := json.Marshal(query)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
-	res, err := api_requests.PostRequest(casesApiUrl, bytes.NewBuffer(queryValue))
+
+	res, err := api_requests.PostRequest(casesApiUrl, strings.NewReader(string(result)))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	var casesResponse casesApiResponse
-	decoder := json.NewDecoder(res.Body)
-	if err := decoder.Decode(&casesResponse); err != nil {
+	err := json.Unmarshal(res.Body, casesResponse)
+	err = decoder.Decode(&casesResponse)
+	if err != nil {
 		return casesApiResponse{}, err
 	}
 	return casesResponse, nil
