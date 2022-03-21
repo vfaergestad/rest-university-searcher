@@ -1,37 +1,51 @@
 package api_requests
 
 import (
-	"assignment-2/internal/webserver/constants"
-	"errors"
+	"io"
 	"net/http"
 )
 
-func DoRequest(url string, method string) (*http.Response, error) {
-	switch method {
-	case
-		http.MethodHead,
-		http.MethodGet,
-		http.MethodDelete,
-		http.MethodConnect,
-		http.MethodOptions,
-		http.MethodPatch,
-		http.MethodPost,
-		http.MethodTrace:
-
-		r, err := http.NewRequest(method, url, nil)
-		if err != nil {
-			return nil, err
-		}
-
-		client := &http.Client{}
-		res, err := client.Do(r)
-		if err != nil {
-			return nil, err
-		}
-
-		return res, nil
-	default:
-		return nil, errors.New(constants.InvalidMethodError)
+func GetRequest(url string) (*http.Response, error) {
+	r, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
 	}
 
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func PostRequest(url string, body io.Reader) (*http.Response, error) {
+	r, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func HeadRequest(url string) (*http.Response, error) {
+	r, err := http.NewRequest(http.MethodHead, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

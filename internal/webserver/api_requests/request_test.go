@@ -9,6 +9,6 @@ func TestDoRequestWithWrongMethod(t *testing.T) {
 	url := "https://testing.url"
 	method := "JUMP"
 
-	_, err := DoRequest(url, method)
+	_, err := GetRequest(url, method)
 	assert.NotEqual(t, nil, err)
 }

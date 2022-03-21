@@ -26,7 +26,7 @@ type policyAction struct {
 
 func GetStatusCode() (int, error) {
 
-	res, err := api_requests.DoRequest(policyApiStatusUrl, http.MethodHead)
+	res, err := api_requests.HeadRequest(policyApiStatusUrl)
 	if err != nil {
 		return -1, err
 	}
@@ -84,7 +84,7 @@ func getResponse(alphaCode string, year string, month string, day string) (polic
 
 	// Create URL and request response from API
 	url := fmt.Sprintf("%s%s/%s-%s-%s", policyApiUrl, alphaCode, year, month, day)
-	res, err := api_requests.DoRequest(url, http.MethodGet)
+	res, err := api_requests.GetRequest(url)
 	if err != nil {
 		return policyApiResponse{}, err
 	}

@@ -19,7 +19,7 @@ type countryApiResponse struct {
 }
 
 func GetStatusCode() (int, error) {
-	res, err := api_requests.DoRequest(countryAPIUrl+"all", http.MethodHead)
+	res, err := api_requests.HeadRequest(countryAPIUrl + "all")
 	if err != nil {
 		return -1, err
 	}
@@ -41,7 +41,7 @@ func GetCountryName(alphaCode string) (string, error) {
 	}
 
 	url := fmt.Sprintf("%salpha/%s?fields=name", countryAPIUrl, alphaCode)
-	res, err := api_requests.DoRequest(url, http.MethodGet)
+	res, err := api_requests.GetRequest(url)
 	if err != nil {
 		return "", err
 	}
@@ -51,9 +51,6 @@ func GetCountryName(alphaCode string) (string, error) {
 		return "", err
 	}
 
-	if countryStruct.Name["common"] == nil {
-		return "", errors.New(constants.CountryNotFoundError)
-	}
 	countryName := countryStruct.Name["common"].(string)
 	if countryName == "" {
 		return "", errors.New(constants.CountryNotFoundError)
