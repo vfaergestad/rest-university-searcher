@@ -58,7 +58,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	casesResponseStruct, err := cases_api.GetResponse(countryQuery)
+	casesResponseStruct, err := cases_api.GetResponseStruct(countryQuery)
 	if err != nil {
 		if constants.IsBadRequestError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)

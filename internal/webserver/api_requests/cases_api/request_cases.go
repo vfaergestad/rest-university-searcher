@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -38,13 +39,23 @@ type mostRecentStruct struct {
 	GrowthRate float64 `json:"growthRate"`
 }
 
-/*
 func GetStatusCode() (int, error) {
+	res, err := getResponse("Norway")
+	if err != nil {
+		return -1, err
+	}
 
-}*/
+	return res.StatusCode, nil
+}
 
-func GetResponse(country string) (structs.CasesResponse, error) {
-	responseStruct, err := getResponse(country)
+func GetResponseStruct(country string) (structs.CasesResponse, error) {
+	res, err := getResponse(country)
+	if err != nil {
+		return structs.CasesResponse{}, err
+	}
+
+	var responseStruct casesApiResponse
+	responseStruct, err = decodeCases(res, responseStruct)
 	if err != nil {
 		return structs.CasesResponse{}, err
 	}
@@ -60,7 +71,7 @@ func GetResponse(country string) (structs.CasesResponse, error) {
 
 }
 
-func getResponse(country string) (casesApiResponse, error) {
+func getResponse(country string) (*http.Response, error) {
 
 	queryString := fmt.Sprintf(`
 		query {
@@ -88,15 +99,19 @@ func getResponse(country string) (casesApiResponse, error) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	return res, nil
+
+}
+
+func decodeCases(res *http.Response, target casesApiResponse) (casesApiResponse, error) {
 	byteResult, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	var casesResponse casesApiResponse
-	err = json.Unmarshal(byteResult, &casesResponse)
+	err = json.Unmarshal(byteResult, &target)
 	if err != nil {
 		return casesApiResponse{}, err
 	}
-	return casesResponse, nil
+	return target, nil
 }
