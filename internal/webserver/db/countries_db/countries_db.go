@@ -37,7 +37,7 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 		m := doc.Data()
 
 		// Removes the entries that are older than the cache expire limit
-		if time.Since(m["time"].(time.Time)) > constants.CacheExpire {
+		if time.Since(m["time"].(time.Time)).Hours() > constants.CacheExpire {
 			_ = DeleteCountry(m["alphaCode"].(string))
 		}
 

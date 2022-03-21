@@ -14,8 +14,8 @@ var client *firestore.Client
 func InitializeFirestore() error {
 	ctx = context.Background()
 
-	opt := option.WithCredentialsFile("serviceAccountKey.json")
-	app, err := firebase.NewApp(ctx, nil, opt)
+	sa := option.WithCredentialsFile("serviceAccountKey.json")
+	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		return err
 	}
