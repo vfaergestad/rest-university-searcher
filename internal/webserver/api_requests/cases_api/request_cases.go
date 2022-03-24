@@ -2,6 +2,7 @@ package cases_api
 
 import (
 	"assignment-2/internal/webserver/api_requests"
+	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
 	"encoding/json"
 	"fmt"
@@ -58,6 +59,10 @@ func GetResponseStruct(country string) (structs.CasesResponse, error) {
 	responseStruct, err = decodeCases(res, responseStruct)
 	if err != nil {
 		return structs.CasesResponse{}, err
+	}
+
+	if responseStruct.Data.Country.Name == "" {
+		return structs.CasesResponse{}, constants.GetCountryNotFoundInCasesApi(country)
 	}
 
 	return structs.CasesResponse{
