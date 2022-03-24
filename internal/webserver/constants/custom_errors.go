@@ -35,6 +35,10 @@ func IsBadRequestError(err error) bool {
 	}
 }
 
+func GetCountryNotFoundInCasesApi(country string) error {
+	return errors.New(fmt.Sprintf("country not found in cases-api: %s", country))
+}
+
 func getDocumentationError() error {
 	return errors.New(fmt.Sprintf("See %s for documentation", linkToDocs))
 }
