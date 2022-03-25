@@ -63,7 +63,7 @@ func GetPolicy(country string, scope string) (structs.PolicyResponse, error) {
 	res := db.GetClient().Collection(collection).Doc(id)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
-		return structs.PolicyResponse{}, errors.New(constants.PolicyNotInCache)
+		return structs.PolicyResponse{}, errors.New(constants.PolicyNotInCacheError)
 	}
 
 	var policy structs.PolicyResponse

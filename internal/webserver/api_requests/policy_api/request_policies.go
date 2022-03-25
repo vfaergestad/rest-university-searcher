@@ -41,6 +41,10 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 		return -1, -1, err
 	}
 
+	if policyResponse.StringencyData["msg"] == "Data unavailable" {
+		return -1, -1, errors.New(constants.PoliciesDataUnavailableError)
+	}
+
 	var stringency float64
 	stringencyRaw := policyResponse.StringencyData["stringency_actual"]
 	if stringencyRaw != nil {

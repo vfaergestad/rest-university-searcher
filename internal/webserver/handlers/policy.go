@@ -55,8 +55,10 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if constants.IsBadRequestError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
 
