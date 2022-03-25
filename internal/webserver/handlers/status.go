@@ -4,8 +4,8 @@ import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
 	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/api_requests/policy_api"
-	"assignment-2/internal/webserver/json_utility"
 	"assignment-2/internal/webserver/uptime"
+	"assignment-2/internal/webserver/utility"
 	"net/http"
 )
 
@@ -53,7 +53,7 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		Uptime:     uptime.GetUptimeString(),
 	}
 
-	err = json_utility.EncodeStruct(w, response)
+	err = utility.EncodeStruct(w, response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
