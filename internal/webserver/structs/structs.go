@@ -16,3 +16,11 @@ type CountryCacheEntry struct {
 	CountryName string
 	Time        time.Time
 }
+
+type PolicyResponse struct {
+	CountryCode string    `json:"country_code"`
+	Scope       string    `json:"scope"`
+	Stringency  float64   `json:"stringency"`
+	Policies    int       `json:"policies"`
+	Time        time.Time `json:"-"`
+}
