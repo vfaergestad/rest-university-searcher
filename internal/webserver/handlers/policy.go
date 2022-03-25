@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"assignment-2/internal/webserver/api_requests/policy_api"
+	"assignment-2/internal/webserver/cache/policy_cache"
 	"assignment-2/internal/webserver/constants"
-	"assignment-2/internal/webserver/json_utility"
+	"assignment-2/internal/webserver/utility"
 	"net/http"
 	"path"
 	"regexp"
@@ -14,13 +14,6 @@ import (
 const (
 	validDateRegex = "^\\d{4}-\\d{2}-\\d{2}$"
 )
-
-type policyResponse struct {
-	CountryCode string  `json:"country_code"`
-	Scope       string  `json:"scope"`
-	Stringency  float64 `json:"stringency"`
-	Policies    int     `json:"policies"`
-}
 
 func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -58,35 +51,16 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 		scope = timeNow.Format("2006-01-02")
 	}
 
-	scopeSplit := strings.Split(scope, "-")
-	year := scopeSplit[0]
-	month := scopeSplit[1]
-	day := scopeSplit[2]
-
-	stringency, polices, err := policy_api.GetStringencyAndPolicies(countryQuery, year, month, day)
+	policyResponseStruct, err := policy_cache.GetPolicy(countryQuery, scope)
 	if err != nil {
-		switch err.Error() {
-		case constants.MalformedAlphaCodeError,
-			constants.MalformedCovidYearError,
-			constants.MalformedMonthError,
-			constants.MalformedDayError:
+		if constants.IsBadRequestError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		default:
+		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-
 		}
 	}
 
-	policyResponseStruct := policyResponse{
-		CountryCode: strings.ToTitle(countryQuery),
-		Scope:       scope,
-		Stringency:  stringency,
-		Policies:    polices,
-	}
-
-	err = json_utility.EncodeStruct(w, policyResponseStruct)
+	err = utility.EncodeStruct(w, policyResponseStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -4,7 +4,7 @@ import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
-	"assignment-2/internal/webserver/json_utility"
+	"assignment-2/internal/webserver/utility"
 	"net/http"
 	"path"
 	"regexp"
@@ -69,7 +69,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = json_utility.EncodeStruct(w, casesResponseStruct)
+	err = utility.EncodeStruct(w, casesResponseStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

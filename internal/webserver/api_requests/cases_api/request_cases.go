@@ -2,6 +2,7 @@ package cases_api
 
 import (
 	"assignment-2/internal/webserver/api_requests"
+	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
 	"encoding/json"
 	"fmt"
@@ -13,31 +14,6 @@ import (
 const (
 	casesApiUrl = "https://covid19-graphql.now.sh"
 )
-
-type queryStruct struct {
-	Query string `json:"query"`
-}
-
-type casesApiResponse struct {
-	Data data `json:"data"`
-}
-
-type data struct {
-	Country countryStruct `json:"country"`
-}
-
-type countryStruct struct {
-	Name       string           `json:"name"`
-	MostRecent mostRecentStruct `json:"mostRecent"`
-}
-
-type mostRecentStruct struct {
-	Date       string  `json:"date"`
-	Confirmed  int     `json:"confirmed"`
-	Recovered  int     `json:"recovered"`
-	Deaths     int     `json:"deaths"`
-	GrowthRate float64 `json:"growthRate"`
-}
 
 func GetStatusCode() (int, error) {
 	res, err := getResponse("Norway")
@@ -58,6 +34,10 @@ func GetResponseStruct(country string) (structs.CasesResponse, error) {
 	responseStruct, err = decodeCases(res, responseStruct)
 	if err != nil {
 		return structs.CasesResponse{}, err
+	}
+
+	if responseStruct.Data.Country.Name == "" {
+		return structs.CasesResponse{}, constants.GetCountryNotFoundInCasesApi(country)
 	}
 
 	return structs.CasesResponse{

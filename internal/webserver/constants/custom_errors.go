@@ -16,8 +16,8 @@ const (
 	CountryNotInCache       = "country not in cache"
 	ExpiredCacheEntry       = "cache entry has expired, and has been deleted"
 	CountryDBIsEmpty        = "the country database is empty"
-	WebhookDBIsEmpty        = "the webhook database is empty"
-	WebhookNotFoundError    = "webhook not found"
+	PolicyNotInCache        = "policy not in cache"
+	PolicyNotFoundError     = "policy not found"
 
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )
@@ -29,7 +29,8 @@ func IsBadRequestError(err error) bool {
 		MalformedMonthError,
 		MalformedDayError,
 		InvalidMethodError,
-		CountryNotFoundError:
+		CountryNotFoundError,
+		PolicyNotFoundError:
 		return true
 	default:
 		return false
