@@ -4,6 +4,7 @@ import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
 	"assignment-2/internal/webserver/structs"
+	"assignment-2/internal/webserver/utility/hash_util"
 	"errors"
 	"google.golang.org/api/iterator"
 )
@@ -30,15 +31,14 @@ func GetAllWebHooks() (map[string]structs.Webhook, error) {
 
 		dbEmpty = false
 
-		m := doc.Data()
+		var webhook structs.Webhook
+		err = doc.DataTo(&webhook)
+		if err != nil {
+			return nil, err
+		}
 
 		// Creates a cache entry struct for each element, and puts it into the result map
-		resultMap[m["webhookId"].(string)] = structs.Webhook{
-			WebhookId: m["webhookId"].(string),
-			Url:       m["url"].(string),
-			Country:   m["country"].(string),
-			Calls:     m["calls"].(int),
-		}
+		resultMap[doc.Ref.ID] = webhook
 
 	}
 
@@ -50,35 +50,44 @@ func GetAllWebHooks() (map[string]structs.Webhook, error) {
 	return resultMap, nil
 }
 
-func GetWebHook(webhookId string) (structs.Webhook, error) {
+func GetWebHook(url string, country string, calls int) (structs.Webhook, error) {
+	webhookId := hash_util.HashWebhook(url, country, calls)
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
 		return structs.Webhook{}, err
 	}
 
-	m := doc.Data()
-	_, exists := m["webhookId"]
-	if !exists {
-		return structs.Webhook{}, errors.New(constants.WebhookNotFoundError)
-	} else {
-		webhook := structs.Webhook{
-			WebhookId: m["webhookId"].(string),
-			Url:       m["url"].(string),
-			Country:   m["country"].(string),
-			Calls:     m["calls"].(int),
-		}
-		return webhook, nil
+	var webhook structs.Webhook
+	err = doc.DataTo(&webhook)
+	if err != nil {
+		return structs.Webhook{}, err
 	}
+	return webhook, nil
 }
 
-func AddWebHook(webhook structs.Webhook) error {
-	webhookId := webhook.WebhookId
+func GetWebHookById(webhookId string) (structs.Webhook, error) {
+	res := db.GetClient().Collection(collection).Doc(webhookId)
+	doc, err := res.Get(db.GetContext())
+	if err != nil {
+		return structs.Webhook{}, err
+	}
+
+	var webhook structs.Webhook
+	err = doc.DataTo(&webhook)
+	if err != nil {
+		return structs.Webhook{}, err
+	}
+	return webhook, nil
+}
+
+func AddWebHook(url string, country string, calls int) error {
+	webhookId := hash_util.HashWebhook(url, country, calls)
 	_, err := db.GetClient().Collection(collection).Doc(webhookId).Set(db.GetContext(), map[string]interface{}{
 		"webhookId": webhookId,
-		"url":       webhook.Url,
-		"country":   webhook.Country,
-		"calls":     webhook.Calls,
+		"url":       url,
+		"country":   country,
+		"calls":     calls,
 	})
 	if err != nil {
 		return err
@@ -87,8 +96,9 @@ func AddWebHook(webhook structs.Webhook) error {
 	}
 }
 
-func DeleteWebhook(webhook structs.Webhook) error {
-	_, err := db.GetClient().Collection(collection).Doc(webhook.WebhookId).Delete(db.GetContext())
+func DeleteWebhook(url string, country string, calls int) error {
+	webhookId := hash_util.HashWebhook(url, country, calls)
+	_, err := db.GetClient().Collection(collection).Doc(webhookId).Delete(db.GetContext())
 	if err != nil {
 		return err
 	} else {

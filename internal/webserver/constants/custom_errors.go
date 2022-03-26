@@ -18,6 +18,7 @@ const (
 	CountryDBIsEmpty        = "the country database is empty"
 	PolicyNotInCache        = "policy not in cache"
 	PolicyNotFoundError     = "policy not found"
+	WebhookDBIsEmpty        = "webhook db is empty"
 
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )

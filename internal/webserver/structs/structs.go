@@ -24,3 +24,10 @@ type PolicyResponse struct {
 	Policies    int       `json:"policies"`
 	Time        time.Time `json:"-"`
 }
+
+type Webhook struct {
+	WebhookId string `json:"webhook_id"`
+	Url       string `json:"url"`
+	Country   string `json:"country"`
+	Calls     int    `json:"calls"`
+}
