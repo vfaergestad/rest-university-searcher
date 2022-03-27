@@ -4,6 +4,7 @@ import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
 	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/api_requests/policy_api"
+	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/uptime"
 	"assignment-2/internal/webserver/utility"
 	"net/http"
@@ -44,11 +45,17 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	webhooks, err := webhooks_db.GetDBSize()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := statusResponse{
 		CasesApi:   casesStatus,
 		PolicyApi:  policyStatus,
 		CountryApi: countryStatus,
-		Webhooks:   0,
+		Webhooks:   webhooks,
 		Version:    "v1",
 		Uptime:     uptime.GetUptimeString(),
 	}

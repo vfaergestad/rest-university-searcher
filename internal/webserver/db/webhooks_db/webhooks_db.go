@@ -126,3 +126,11 @@ func DeleteWebhook(webhookId string) error {
 		return nil
 	}
 }
+
+func GetDBSize() (int, error) {
+	res, err := db.GetClient().Collection(collection).Documents(db.GetContext()).GetAll()
+	if err != nil {
+		return -1, err
+	}
+	return len(res), nil
+}
