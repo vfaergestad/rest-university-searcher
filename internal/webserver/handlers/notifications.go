@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/structs"
@@ -8,6 +9,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -108,6 +110,22 @@ func registerWebhook(w http.ResponseWriter, r *http.Request) {
 	if webhook.Calls < 1 {
 		http.Error(w, "calls must be 1 or greater", http.StatusBadRequest)
 		return
+	}
+
+	match, err := regexp.MatchString(constants.AlphaCodeRegex, webhook.Country)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if match {
+		webhook.Country, err = country_cache.GetCountry(webhook.Country)
+		if err != nil {
+			switch err.Error() {
+			case constants.CountryNotFoundError:
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			default:
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}
 	}
 
 	webhookId, err := webhooks_db.AddWebhook(webhook.Url, webhook.Country, webhook.Calls)
