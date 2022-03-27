@@ -11,8 +11,8 @@ import (
 
 const collection = "webhooks"
 
-func GetAllWebHooks() (map[string]structs.Webhook, error) {
-	resultMap := map[string]structs.Webhook{}
+func GetAllWebHooks() ([]structs.Webhook, error) {
+	var resultSlice []structs.Webhook
 	dbEmpty := true
 
 	iter := db.GetClient().Collection(collection).Documents(db.GetContext())
@@ -38,24 +38,27 @@ func GetAllWebHooks() (map[string]structs.Webhook, error) {
 		}
 
 		// Creates a cache entry struct for each element, and puts it into the result map
-		resultMap[doc.Ref.ID] = webhook
+		resultSlice = append(resultSlice, webhook)
 
 	}
 
 	// Return an empty map if the database is empty
 	if dbEmpty {
-		return map[string]structs.Webhook{}, errors.New(constants.WebhookDBIsEmpty)
+		return []structs.Webhook{}, errors.New(constants.WebhookDBIsEmpty)
 	}
 
-	return resultMap, nil
+	return resultSlice, nil
 }
 
-func GetWebHook(url string, country string, calls int) (structs.Webhook, error) {
+func GetWebhook(url string, country string, calls int) (structs.Webhook, error) {
 	webhookId := hash_util.HashWebhook(url, country, calls)
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
 		return structs.Webhook{}, err
+	}
+	if !doc.Exists() {
+
 	}
 
 	var webhook structs.Webhook
@@ -66,11 +69,14 @@ func GetWebHook(url string, country string, calls int) (structs.Webhook, error) 
 	return webhook, nil
 }
 
-func GetWebHookById(webhookId string) (structs.Webhook, error) {
+func GetWebhookById(webhookId string) (structs.Webhook, error) {
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
 		return structs.Webhook{}, err
+	}
+	if !doc.Exists() {
+		return structs.Webhook{}, errors.New(constants.WebhookNotFoundError)
 	}
 
 	var webhook structs.Webhook
@@ -81,24 +87,39 @@ func GetWebHookById(webhookId string) (structs.Webhook, error) {
 	return webhook, nil
 }
 
-func AddWebHook(url string, country string, calls int) error {
+func AddWebhook(url string, country string, calls int) (string, error) {
 	webhookId := hash_util.HashWebhook(url, country, calls)
-	_, err := db.GetClient().Collection(collection).Doc(webhookId).Set(db.GetContext(), map[string]interface{}{
+
+	res := db.GetClient().Collection(collection).Doc(webhookId)
+	doc, err := res.Get(db.GetContext())
+	if err != nil {
+		return "", err
+	}
+	if doc.Exists() {
+		return "", errors.New(constants.WebhookAlreadyExistingError)
+	}
+
+	_, err = res.Set(db.GetContext(), map[string]interface{}{
 		"webhookId": webhookId,
 		"url":       url,
 		"country":   country,
 		"calls":     calls,
 	})
 	if err != nil {
-		return err
+		return "", err
 	} else {
-		return nil
+		return webhookId, nil
 	}
 }
 
-func DeleteWebhook(url string, country string, calls int) error {
-	webhookId := hash_util.HashWebhook(url, country, calls)
-	_, err := db.GetClient().Collection(collection).Doc(webhookId).Delete(db.GetContext())
+func DeleteWebhook(webhookId string) error {
+	res := db.GetClient().Collection(collection).Doc(webhookId)
+	doc, err := res.Get(db.GetContext())
+	if !doc.Exists() {
+		return errors.New(constants.WebhookNotFoundError)
+	}
+
+	_, err = res.Delete(db.GetContext())
 	if err != nil {
 		return err
 	} else {
