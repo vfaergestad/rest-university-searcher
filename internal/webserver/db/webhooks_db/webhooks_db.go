@@ -91,15 +91,12 @@ func AddWebhook(url string, country string, calls int) (string, error) {
 	webhookId := hash_util.HashWebhook(url, country, calls)
 
 	res := db.GetClient().Collection(collection).Doc(webhookId)
-	doc, err := res.Get(db.GetContext())
-	if err != nil {
-		return "", err
-	}
+	doc, _ := res.Get(db.GetContext())
 	if doc.Exists() {
 		return "", errors.New(constants.WebhookAlreadyExistingError)
 	}
 
-	_, err = res.Set(db.GetContext(), map[string]interface{}{
+	_, err := res.Set(db.GetContext(), map[string]interface{}{
 		"webhookId": webhookId,
 		"url":       url,
 		"country":   country,
