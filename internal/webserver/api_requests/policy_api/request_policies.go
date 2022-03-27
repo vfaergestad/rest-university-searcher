@@ -1,8 +1,8 @@
 package policy_api
 
 import (
-	"assignment-2/internal/webserver/api_requests"
 	"assignment-2/internal/webserver/constants"
+	"assignment-2/internal/webserver/utility"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,7 +26,7 @@ type policyAction struct {
 
 func GetStatusCode() (int, error) {
 
-	res, err := api_requests.HeadRequest(policyApiStatusUrl)
+	res, err := utility.HeadRequest(policyApiStatusUrl)
 	if err != nil {
 		return -1, err
 	}
@@ -88,7 +88,7 @@ func getResponse(alphaCode string, year string, month string, day string) (polic
 
 	// Create URL and request response from API
 	url := fmt.Sprintf("%s%s/%s-%s-%s", policyApiUrl, alphaCode, year, month, day)
-	res, err := api_requests.GetRequest(url)
+	res, err := utility.GetRequest(url)
 	if err != nil {
 		return policyApiResponse{}, err
 	}

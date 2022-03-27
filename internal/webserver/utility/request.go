@@ -1,4 +1,4 @@
-package api_requests
+package utility
 
 import (
 	"io"

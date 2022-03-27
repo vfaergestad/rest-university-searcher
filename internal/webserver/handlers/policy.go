@@ -4,6 +4,7 @@ import (
 	"assignment-2/internal/webserver/cache/policy_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
 	"regexp"
@@ -33,6 +34,8 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 
 	// Defines the different queries in the url
 	countryQuery := path.Base(cleanPath)
+
+	go webhooks.Invoke(countryQuery)
 
 	scope := r.URL.Query().Get("scope")
 

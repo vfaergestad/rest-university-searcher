@@ -5,6 +5,7 @@ import (
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
 	"regexp"
@@ -57,6 +58,8 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+	go webhooks.Invoke(countryQuery)
 
 	casesResponseStruct, err := cases_api.GetResponseStruct(countryQuery)
 	if err != nil {
