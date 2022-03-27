@@ -1,9 +1,9 @@
 package cases_api
 
 import (
-	"assignment-2/internal/webserver/api_requests"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
+	"assignment-2/internal/webserver/utility"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -75,7 +75,7 @@ func getResponse(country string) (*http.Response, error) {
 		fmt.Println(err.Error())
 	}
 
-	res, err := api_requests.PostRequest(casesApiUrl, strings.NewReader(string(result)))
+	res, err := utility.PostRequest(casesApiUrl, strings.NewReader(string(result)))
 	if err != nil {
 		fmt.Println(err.Error())
 	}

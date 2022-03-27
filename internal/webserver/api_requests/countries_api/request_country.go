@@ -1,8 +1,8 @@
 package countries_api
 
 import (
-	"assignment-2/internal/webserver/api_requests"
 	"assignment-2/internal/webserver/constants"
+	"assignment-2/internal/webserver/utility"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,7 +19,7 @@ type countryApiResponse struct {
 }
 
 func GetStatusCode() (int, error) {
-	res, err := api_requests.HeadRequest(countryAPIUrl + "all")
+	res, err := utility.HeadRequest(countryAPIUrl + "all")
 	if err != nil {
 		return -1, err
 	}
@@ -41,7 +41,7 @@ func GetCountryName(alphaCode string) (string, error) {
 	}
 
 	url := fmt.Sprintf("%salpha/%s?fields=name", countryAPIUrl, alphaCode)
-	res, err := api_requests.GetRequest(url)
+	res, err := utility.GetRequest(url)
 	if err != nil {
 		return "", err
 	}
