@@ -16,11 +16,6 @@ func Init() {
 	startTime = time.Now()
 }
 
-// GetUptimeInSeconds returns the time in seconds since the last restart
-func GetUptimeInSeconds() int {
-	return int(time.Since(startTime).Seconds())
-}
-
 func GetUptimeString() string {
-	return time.Since(startTime).String()
+	return time.Since(startTime).Round(time.Second).String()
 }
