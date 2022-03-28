@@ -11,10 +11,6 @@ import (
 	"strings"
 )
 
-const (
-	casesApiUrl = "https://covid19-graphql.now.sh"
-)
-
 func GetStatusCode() (int, error) {
 	res, err := getResponse("Norway")
 	if err != nil {
@@ -75,7 +71,7 @@ func getResponse(country string) (*http.Response, error) {
 		fmt.Println(err.Error())
 	}
 
-	res, err := utility.PostRequest(casesApiUrl, strings.NewReader(string(result)))
+	res, err := utility.PostRequest(constants.CasesApiUrl, strings.NewReader(string(result)))
 	if err != nil {
 		fmt.Println(err.Error())
 	}

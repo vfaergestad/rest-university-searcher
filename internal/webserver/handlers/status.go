@@ -5,8 +5,8 @@ import (
 	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/api_requests/policy_api"
 	"assignment-2/internal/webserver/db/webhooks_db"
-	"assignment-2/internal/webserver/uptime"
 	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/uptime"
 	"net/http"
 )
 

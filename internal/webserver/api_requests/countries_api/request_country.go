@@ -10,16 +10,12 @@ import (
 	"regexp"
 )
 
-const (
-	countryAPIUrl = "https://restcountries.com/v3.1/"
-)
-
 type countryApiResponse struct {
 	Name map[string]interface{} `json:"name"`
 }
 
 func GetStatusCode() (int, error) {
-	res, err := utility.HeadRequest(countryAPIUrl + "all")
+	res, err := utility.HeadRequest(constants.CountryAPIUrl + "all")
 	if err != nil {
 		return -1, err
 	}
@@ -40,7 +36,7 @@ func GetCountryName(alphaCode string) (string, error) {
 		return "", errors.New(constants.MalformedAlphaCodeError)
 	}
 
-	url := fmt.Sprintf("%salpha/%s?fields=name", countryAPIUrl, alphaCode)
+	url := fmt.Sprintf("%salpha/%s?fields=name", constants.CountryAPIUrl, alphaCode)
 	res, err := utility.GetRequest(url)
 	if err != nil {
 		return "", err

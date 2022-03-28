@@ -5,7 +5,7 @@ import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
 	"assignment-2/internal/webserver/handlers"
-	"assignment-2/internal/webserver/uptime"
+	"assignment-2/internal/webserver/utility/uptime"
 	"log"
 	"net/http"
 )

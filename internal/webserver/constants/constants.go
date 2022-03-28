@@ -15,3 +15,17 @@ const (
 
 	CacheExpire = 1200
 )
+
+var (
+	CasesApiUrl        = "https://covid19-graphql.now.sh"
+	CountryAPIUrl      = "https://restcountries.com/v3.1/"
+	PolicyApiStatusUrl = "https://covidtrackerapi.bsg.ox.ac.uk/api/"
+	PolicyApiUrl       = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
+)
+
+func SetTestUrls(port string) {
+	CasesApiUrl = "http://localhost:" + port
+	CountryAPIUrl = "http://localhost:" + port
+	PolicyApiStatusUrl = "http://localhost:" + port
+	PolicyApiUrl = "http://localhost:" + port
+}

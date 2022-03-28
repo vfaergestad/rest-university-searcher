@@ -10,11 +10,6 @@ import (
 	"regexp"
 )
 
-const (
-	policyApiStatusUrl = "https://covidtrackerapi.bsg.ox.ac.uk/api/"
-	policyApiUrl       = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
-)
-
 type policyApiResponse struct {
 	PolicyActions  []policyAction         `json:"policyActions"`
 	StringencyData map[string]interface{} `json:"stringencyData"`
@@ -26,7 +21,7 @@ type policyAction struct {
 
 func GetStatusCode() (int, error) {
 
-	res, err := utility.HeadRequest(policyApiStatusUrl)
+	res, err := utility.HeadRequest(constants.PolicyApiStatusUrl)
 	if err != nil {
 		return -1, err
 	}
@@ -47,13 +42,13 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 
 	var stringency float64
 	stringencyRaw := policyResponse.StringencyData["stringency_actual"]
-	if stringencyRaw != nil {
-		stringency = policyResponse.StringencyData["stringency_actual"].(float64)
+	if stringencyRaw == nil {
+		stringency = policyResponse.StringencyData["stringency"].(float64)
 		if stringency == 0 {
-			stringency = policyResponse.StringencyData["stringency"].(float64)
+			stringency = -1
 		}
 	} else {
-		stringency = -1
+		stringency = policyResponse.StringencyData["stringency_actual"].(float64)
 	}
 
 	policies := len(policyResponse.PolicyActions)
@@ -87,7 +82,7 @@ func getResponse(alphaCode string, year string, month string, day string) (polic
 	}
 
 	// Create URL and request response from API
-	url := fmt.Sprintf("%s%s/%s-%s-%s", policyApiUrl, alphaCode, year, month, day)
+	url := fmt.Sprintf("%s%s/%s-%s-%s", constants.PolicyApiUrl, alphaCode, year, month, day)
 	res, err := utility.GetRequest(url)
 	if err != nil {
 		return policyApiResponse{}, err
