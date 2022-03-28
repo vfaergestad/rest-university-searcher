@@ -52,26 +52,7 @@ func GetAllWebHooks() ([]structs.Webhook, error) {
 	return resultSlice, nil
 }
 
-func GetWebhook(url string, country string, calls int) (structs.Webhook, error) {
-	webhookId := hash_util.HashWebhook(url, country, calls)
-	res := db.GetClient().Collection(collection).Doc(webhookId)
-	doc, err := res.Get(db.GetContext())
-	if err != nil {
-		return structs.Webhook{}, err
-	}
-	if !doc.Exists() {
-
-	}
-
-	var webhook structs.Webhook
-	err = doc.DataTo(&webhook)
-	if err != nil {
-		return structs.Webhook{}, err
-	}
-	return webhook, nil
-}
-
-func GetWebhookById(webhookId string) (structs.Webhook, error) {
+func GetWebhook(webhookId string) (structs.Webhook, error) {
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {

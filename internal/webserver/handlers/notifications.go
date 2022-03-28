@@ -67,7 +67,7 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 	cleanPath := path.Clean(r.URL.Path)
 	webhookId := path.Base(cleanPath)
 
-	webhook, err := webhooks_db.GetWebhookById(webhookId)
+	webhook, err := webhooks_db.GetWebhook(webhookId)
 	if err != nil {
 		if err.Error() == constants.WebhookNotFoundError {
 			http.Error(w, err.Error(), http.StatusBadRequest)
