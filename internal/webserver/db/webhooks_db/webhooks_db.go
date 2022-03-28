@@ -3,10 +3,12 @@ package webhooks_db
 import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
+	"assignment-2/internal/webserver/db/invocations_db"
 	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility/hash_util"
 	"errors"
 	"google.golang.org/api/iterator"
+	"strings"
 )
 
 const collection = "webhooks"
@@ -89,6 +91,7 @@ func GetWebhookById(webhookId string) (structs.Webhook, error) {
 
 func AddWebhook(url string, country string, calls int) (string, error) {
 	webhookId := hash_util.HashWebhook(url, country, calls)
+	country = strings.Title(country)
 
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, _ := res.Get(db.GetContext())
@@ -96,11 +99,17 @@ func AddWebhook(url string, country string, calls int) (string, error) {
 		return "", errors.New(constants.WebhookAlreadyExistingError)
 	}
 
-	_, err := res.Set(db.GetContext(), map[string]interface{}{
-		"webhookId": webhookId,
-		"url":       url,
-		"country":   country,
-		"calls":     calls,
+	startCount, err := invocations_db.GetInvocation(country)
+	if err != nil {
+		startCount = 0
+	}
+
+	_, err = res.Set(db.GetContext(), map[string]interface{}{
+		"webhookId":  webhookId,
+		"url":        url,
+		"country":    country,
+		"calls":      calls,
+		"startCount": startCount,
 	})
 	if err != nil {
 		return "", err

@@ -45,7 +45,7 @@ func checkAndInvokeWebhooks(country string) error {
 	}
 	for _, v := range webhooks {
 		count, _ := invocations_db.GetInvocation(v.Country)
-		if v.Calls <= count && v.Country == country {
+		if 0 == (count-v.StartCount)%v.Calls && v.Country == country {
 			go callWebhook(v)
 		}
 	}

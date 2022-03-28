@@ -26,8 +26,9 @@ type PolicyResponse struct {
 }
 
 type Webhook struct {
-	WebhookId string `json:"webhook_id"`
-	Url       string `json:"url,omitempty"`
-	Country   string `json:"country"`
-	Calls     int    `json:"calls"`
+	WebhookId  string `json:"webhook_id"`
+	Url        string `json:"url,omitempty"`
+	Country    string `json:"country"`
+	Calls      int    `json:"calls"`
+	StartCount int    `json:"-"`
 }
