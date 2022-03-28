@@ -1,6 +1,7 @@
 package db
 
 import (
+	"assignment-2/internal/webserver/constants"
 	"cloud.google.com/go/firestore"
 	"context"
 	firebase "firebase.google.com/go"
@@ -14,7 +15,7 @@ var client *firestore.Client
 func InitializeFirestore() error {
 	ctx = context.Background()
 
-	sa := option.WithCredentialsFile("serviceAccountKey.json")
+	sa := option.WithCredentialsFile(constants.ServiceAccountLocation)
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		return err

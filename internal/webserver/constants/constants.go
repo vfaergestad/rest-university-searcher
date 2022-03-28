@@ -16,6 +16,12 @@ const (
 	CacheExpire = 1200
 )
 
+var ServiceAccountLocation = "serviceAccountKey.json"
+
+func SetTestServiceAccountLocation() {
+	ServiceAccountLocation = "./../serviceAccountKey.json"
+}
+
 var (
 	CasesApiUrl        = "https://covid19-graphql.now.sh"
 	CountryAPIUrl      = "https://restcountries.com/v3.1/"
@@ -23,9 +29,18 @@ var (
 	PolicyApiUrl       = "https://covidtrackerapi.bsg.ox.ac.uk/api/v2/stringency/actions/"
 )
 
-func SetTestUrls(port string) {
-	CasesApiUrl = "http://localhost:" + port
-	CountryAPIUrl = "http://localhost:" + port
-	PolicyApiStatusUrl = "http://localhost:" + port
-	PolicyApiUrl = "http://localhost:" + port
+func SetTestCasesApiUrl(url string) {
+	CasesApiUrl = url + "/"
+}
+
+func SetTestCountryAPIUrl(url string) {
+	CountryAPIUrl = url + "/"
+}
+
+func SetTestPolicyApiStatusUrl(url string) {
+	PolicyApiStatusUrl = url + "/"
+}
+
+func SetTestPolicyApiUrl(url string) {
+	PolicyApiUrl = url + "/"
 }
