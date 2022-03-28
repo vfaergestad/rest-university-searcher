@@ -2,6 +2,7 @@ package policy_api
 
 import (
 	"assignment-2/internal/webserver/constants"
+	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility"
 	"encoding/json"
 	"errors"
@@ -9,15 +10,6 @@ import (
 	"net/http"
 	"regexp"
 )
-
-type policyApiResponse struct {
-	PolicyActions  []policyAction         `json:"policyActions"`
-	StringencyData map[string]interface{} `json:"stringencyData"`
-}
-
-type policyAction struct {
-	PolicyTypeCode string `json:"policy_type_code"`
-}
 
 func GetStatusCode() (int, error) {
 
@@ -66,31 +58,31 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 //					- MALFORMED_COVID_YEAR_ERROR
 //					- MALFORMED_MONTH_ERROR
 //					- MALFORMED_DAY_ERROR
-func getResponse(alphaCode string, year string, month string, day string) (policyApiResponse, error) {
+func getResponse(alphaCode string, year string, month string, day string) (structs.PolicyApiResponse, error) {
 	// Checks if given alpha-code is a three letter string.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, alphaCode)
 	if err != nil {
-		return policyApiResponse{}, err
+		return structs.PolicyApiResponse{}, err
 	} else if !match {
-		return policyApiResponse{}, errors.New(constants.MalformedAlphaCodeError)
+		return structs.PolicyApiResponse{}, errors.New(constants.MalformedAlphaCodeError)
 	}
 
 	// Check if given date is valid.
 	_, err = checkDate(year, month, day)
 	if err != nil {
-		return policyApiResponse{}, err
+		return structs.PolicyApiResponse{}, err
 	}
 
 	// Create URL and request response from API
 	url := fmt.Sprintf("%s%s/%s-%s-%s", constants.PolicyApiUrl, alphaCode, year, month, day)
 	res, err := utility.GetRequest(url)
 	if err != nil {
-		return policyApiResponse{}, err
+		return structs.PolicyApiResponse{}, err
 	}
 
-	policy, err := decodePolicy(res, policyApiResponse{})
+	policy, err := decodePolicy(res, structs.PolicyApiResponse{})
 	if err != nil {
-		return policyApiResponse{}, err
+		return structs.PolicyApiResponse{}, err
 	}
 
 	return policy, nil
@@ -125,10 +117,10 @@ func checkDate(year string, month string, day string) (bool, error) {
 	return true, nil
 }
 
-func decodePolicy(res *http.Response, target policyApiResponse) (policyApiResponse, error) {
+func decodePolicy(res *http.Response, target structs.PolicyApiResponse) (structs.PolicyApiResponse, error) {
 	decoder := json.NewDecoder(res.Body)
 	if err := decoder.Decode(&target); err != nil {
-		return policyApiResponse{}, err
+		return structs.PolicyApiResponse{}, err
 	}
 	return target, nil
 }

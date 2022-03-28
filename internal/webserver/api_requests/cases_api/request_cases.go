@@ -26,7 +26,7 @@ func GetResponseStruct(country string) (structs.CasesResponse, error) {
 		return structs.CasesResponse{}, err
 	}
 
-	var responseStruct casesApiResponse
+	var responseStruct structs.CasesApiResponse
 	responseStruct, err = decodeCases(res, responseStruct)
 	if err != nil {
 		return structs.CasesResponse{}, err
@@ -79,7 +79,7 @@ func getResponse(country string) (*http.Response, error) {
 
 }
 
-func decodeCases(res *http.Response, target casesApiResponse) (casesApiResponse, error) {
+func decodeCases(res *http.Response, target structs.CasesApiResponse) (structs.CasesApiResponse, error) {
 	byteResult, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -87,7 +87,7 @@ func decodeCases(res *http.Response, target casesApiResponse) (casesApiResponse,
 
 	err = json.Unmarshal(byteResult, &target)
 	if err != nil {
-		return casesApiResponse{}, err
+		return structs.CasesApiResponse{}, err
 	}
 	return target, nil
 }
