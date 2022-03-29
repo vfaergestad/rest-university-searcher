@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestGetRequests(t *testing.T) {
+func TestGetRequestsFromCases(t *testing.T) {
 	type args struct {
 		url string
 	}
@@ -129,7 +129,7 @@ func TestGetRequests(t *testing.T) {
 	}
 }
 
-func TestInvalidPostRequest(t *testing.T) {
+func TestInvalidPostRequestFromCases(t *testing.T) {
 	type args struct {
 		url string
 	}
