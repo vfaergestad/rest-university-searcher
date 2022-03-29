@@ -4,7 +4,9 @@ import (
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
+	"assignment-2/internal/webserver/db/policies_db"
 	"assignment-2/internal/webserver/handlers"
+	"assignment-2/internal/webserver/utility/uptime"
 	"assignment-2/tests/mock_apis"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,7 @@ import (
 
 var CasesEndpoint *httptest.Server
 var PolicyEndpoint *httptest.Server
+var StatusEndpoint *httptest.Server
 
 func TestMain(m *testing.M) {
 
@@ -32,6 +35,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+	policies_db.SetTestMode()
 
 	defer func() {
 		err = db.CloseFirestore()
@@ -50,6 +54,11 @@ func TestMain(m *testing.M) {
 
 	PolicyEndpoint = httptest.NewServer(http.HandlerFunc(handlers.HandlerPolicy))
 	defer PolicyEndpoint.Close()
+
+	StatusEndpoint = httptest.NewServer(http.HandlerFunc(handlers.HandlerStatus))
+	defer StatusEndpoint.Close()
+
+	uptime.Init()
 
 	m.Run()
 
