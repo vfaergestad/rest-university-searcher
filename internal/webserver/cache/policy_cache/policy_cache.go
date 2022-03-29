@@ -2,6 +2,7 @@ package policy_cache
 
 import (
 	"assignment-2/internal/webserver/api_requests/policy_api"
+	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db/policies_db"
 	"assignment-2/internal/webserver/structs"
 	"strings"
@@ -15,7 +16,7 @@ func GetPolicy(countryCode string, scope string) (structs.PolicyResponse, error)
 			return structs.PolicyResponse{}, err
 		} else {
 			err = policies_db.AddPolicy(policy)
-			if err != nil {
+			if err != nil && err.Error() != constants.TestModeActiveError {
 				return structs.PolicyResponse{}, err
 			}
 		}

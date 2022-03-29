@@ -11,6 +11,8 @@ import (
 
 const collection = "policies"
 
+var testMode = false
+
 /*
 func GetAllPolicies() (map[string]structs.PolicyResponseCacheEntry, error) {
 	resultMap := map[string]structs.PolicyResponseCacheEntry{}
@@ -59,6 +61,9 @@ func GetAllPolicies() (map[string]structs.PolicyResponseCacheEntry, error) {
 }*/
 
 func GetPolicy(country string, scope string) (structs.PolicyResponse, error) {
+	if testMode {
+		return structs.PolicyResponse{}, errors.New(constants.TestModeActiveError)
+	}
 	id := hash_util.HashPolicy(country, scope)
 	res := db.GetClient().Collection(collection).Doc(id)
 	doc, err := res.Get(db.GetContext())
@@ -82,6 +87,9 @@ func GetPolicy(country string, scope string) (structs.PolicyResponse, error) {
 }
 
 func AddPolicy(policy structs.PolicyResponse) error {
+	if testMode {
+		return errors.New(constants.TestModeActiveError)
+	}
 	id := hash_util.HashPolicy(policy.CountryCode, policy.Scope)
 	_, err := db.GetClient().Collection(collection).Doc(id).Set(db.GetContext(), map[string]interface{}{
 		"countryCode": policy.CountryCode,
@@ -98,6 +106,9 @@ func AddPolicy(policy structs.PolicyResponse) error {
 }
 
 func DeletePolicy(country string, scope string) error {
+	if testMode {
+		return errors.New(constants.TestModeActiveError)
+	}
 	id := hash_util.HashPolicy(country, scope)
 	_, err := db.GetClient().Collection(collection).Doc(id).Delete(db.GetContext())
 	if err != nil {
@@ -105,4 +116,8 @@ func DeletePolicy(country string, scope string) error {
 	} else {
 		return nil
 	}
+}
+
+func SetTestMode() {
+	testMode = true
 }
