@@ -19,7 +19,7 @@ const (
 var ServiceAccountLocation = "serviceAccountKey.json"
 
 func SetTestServiceAccountLocation() {
-	ServiceAccountLocation = "./../serviceAccountKey.json"
+	ServiceAccountLocation = "./../../../../serviceAccountKey.json"
 }
 
 var (
