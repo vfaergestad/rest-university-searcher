@@ -1,4 +1,4 @@
-package handlers
+package policy_handler
 
 import (
 	"assignment-2/internal/webserver/cache/policy_cache"

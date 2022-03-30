@@ -1,4 +1,4 @@
-package handlers
+package cases_handler
 
 import (
 	"assignment-2/internal/webserver/api_requests/cases_api"

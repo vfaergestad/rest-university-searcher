@@ -1,4 +1,4 @@
-package handlers
+package status_handler
 
 import (
 	"assignment-2/internal/webserver/api_requests/cases_api"

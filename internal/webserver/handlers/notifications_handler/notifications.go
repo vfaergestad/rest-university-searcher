@@ -1,4 +1,4 @@
-package handlers
+package notifications_handler
 
 import (
 	"assignment-2/internal/webserver/cache/country_cache"
