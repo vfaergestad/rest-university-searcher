@@ -1,7 +1,6 @@
 package mock_apis
 
 import (
-	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility"
 	"encoding/json"
@@ -22,22 +21,33 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 	}
 
+	var response structs.CasesApiResponse
 	if strings.Contains(query.Query, "Taiwan") {
-		http.Error(w, constants.GetCountryNotFoundInCasesApi("Taiwan").Error(), http.StatusBadRequest)
-		return
-	}
+		response = structs.CasesApiResponse{Data: structs.Data{
+			Country: structs.CountryStruct{
+				Name: "",
+				MostRecent: structs.MostRecentStruct{
+					Date:       "",
+					Confirmed:  0,
+					Recovered:  0,
+					Deaths:     0,
+					GrowthRate: 0,
+				},
+			}}}
+	} else {
+		response = structs.CasesApiResponse{Data: structs.Data{
+			Country: structs.CountryStruct{
+				Name: "Norway",
+				MostRecent: structs.MostRecentStruct{
+					Date:       "2020-01-01",
+					Confirmed:  1,
+					Recovered:  2,
+					Deaths:     3,
+					GrowthRate: 4,
+				},
+			}}}
 
-	response := structs.CasesApiResponse{Data: structs.Data{
-		Country: structs.CountryStruct{
-			Name: "Norway",
-			MostRecent: structs.MostRecentStruct{
-				Date:       "2020-01-01",
-				Confirmed:  1,
-				Recovered:  2,
-				Deaths:     3,
-				GrowthRate: 4,
-			},
-		}}}
+	}
 
 	err = utility.EncodeStruct(w, response)
 	if err != nil {
