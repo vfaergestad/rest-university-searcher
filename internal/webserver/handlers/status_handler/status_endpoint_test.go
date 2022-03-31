@@ -99,6 +99,7 @@ func TestRequestToStatus(t *testing.T) {
 			}
 
 			if tt.expectedResponse != (statusResponse{}) {
+				tt.expectedResponse.Uptime = uptime.GetUptimeString()
 				var actual statusResponse
 				_ = json.NewDecoder(res.Body).Decode(&actual)
 
