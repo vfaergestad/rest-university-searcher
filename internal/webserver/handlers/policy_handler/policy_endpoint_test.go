@@ -76,7 +76,7 @@ func TestRequestsFromPolicyApi(t *testing.T) {
 			expectedResponse: structs.PolicyResponse{
 				CountryCode: "SWE",
 				Scope:       "2021-01-01",
-				Stringency:  13.89,
+				Stringency:  12.69,
 				Policies:    0,
 			},
 		},
