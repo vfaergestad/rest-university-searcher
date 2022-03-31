@@ -36,9 +36,6 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 	stringencyRaw := policyResponse.StringencyData["stringency_actual"]
 	if stringencyRaw == nil {
 		stringency = policyResponse.StringencyData["stringency"].(float64)
-		if stringency == 0 {
-			stringency = -1
-		}
 	} else {
 		stringency = policyResponse.StringencyData["stringency_actual"].(float64)
 	}
