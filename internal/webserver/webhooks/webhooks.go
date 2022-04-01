@@ -3,7 +3,6 @@ package webhooks
 import (
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
-	"assignment-2/internal/webserver/db/invocations_db"
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility"
@@ -28,10 +27,6 @@ func Invoke(country string) {
 		}
 	}
 
-	err = invocations_db.AddInvocation(country)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	err = checkAndInvokeWebhooks(country)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -43,10 +38,15 @@ func checkAndInvokeWebhooks(country string) error {
 	if err != nil {
 		return err
 	}
-	for _, v := range webhooks {
-		count, _ := invocations_db.GetInvocation(v.Country)
-		if 0 == (count-v.StartCount)%v.Calls && v.Country == country {
-			go callWebhook(v)
+	for _, w := range webhooks {
+
+		if w.Country == country {
+			w.Count = w.Count + 1
+			if w.Count >= w.Calls {
+				go callWebhook(w)
+				w.Count = 0
+			}
+			_, err = webhooks_db.UpdateWebhook(w.Url, w.Country, w.Calls, w.Count)
 		}
 	}
 	return nil
@@ -57,12 +57,12 @@ func callWebhook(webhook structs.Webhook) {
 	body.Url = ""
 	result, err := json.Marshal(body)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
-	fmt.Println("Attempting invocation of url " + webhook.Url)
+	log.Println("Attempting invocation of url " + webhook.Url)
 	res, err := utility.PostRequest(webhook.Url, strings.NewReader(string(result)))
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
 
 	// Read the response
