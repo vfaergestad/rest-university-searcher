@@ -5,7 +5,7 @@ import (
 	"assignment-2/internal/webserver/api_requests/countries_api"
 	"assignment-2/internal/webserver/api_requests/policy_api"
 	"assignment-2/internal/webserver/db/webhooks_db"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/encode_struct"
 	"assignment-2/internal/webserver/utility/uptime"
 	"net/http"
 )
@@ -27,29 +27,10 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	policyStatus, err := policy_api.GetStatusCode()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	countryStatus, err := countries_api.GetStatusCode()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	casesStatus, err := cases_api.GetStatusCode()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	webhooks, err := webhooks_db.GetDBSize()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	policyStatus, _ := policy_api.GetStatusCode()
+	countryStatus, _ := countries_api.GetStatusCode()
+	casesStatus, _ := cases_api.GetStatusCode()
+	webhooks, _ := webhooks_db.GetDBSize()
 
 	response := statusResponse{
 		CasesApi:   casesStatus,
@@ -60,7 +41,7 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		Uptime:     uptime.GetUptimeString(),
 	}
 
-	err = utility.EncodeStruct(w, response)
+	err := encode_struct.EncodeStruct(w, response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -6,6 +6,7 @@ import (
 	"assignment-2/internal/webserver/db/countries_db"
 	"assignment-2/internal/webserver/structs"
 	"errors"
+	"log"
 	"time"
 )
 
@@ -56,6 +57,7 @@ func updateCountry(alphaCode string) (string, error) {
 func addCountry(alphaCode string, countryName string) error {
 	_, exists := cache[alphaCode]
 	if exists {
+		log.Println(errors.New(constants.CountryAlreadyInCache))
 		return errors.New(constants.CountryAlreadyInCache)
 	} else {
 		cache[alphaCode] = structs.CountryCacheEntry{
@@ -70,6 +72,7 @@ func addCountry(alphaCode string, countryName string) error {
 func removeCountry(alphaCode string) error {
 	_, exists := cache[alphaCode]
 	if !exists {
+		log.Println(errors.New(constants.CountryNotInCache))
 		return errors.New(constants.CountryNotInCache)
 	} else {
 		delete(cache, alphaCode)

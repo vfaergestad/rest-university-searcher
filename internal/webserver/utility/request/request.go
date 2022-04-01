@@ -1,19 +1,22 @@
-package utility
+package request
 
 import (
 	"io"
+	"log"
 	"net/http"
 )
 
 func GetRequest(url string) (*http.Response, error) {
 	r, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
+		log.Print(err)
 		return nil, err
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -23,12 +26,14 @@ func GetRequest(url string) (*http.Response, error) {
 func PostRequest(url string, body io.Reader) (*http.Response, error) {
 	r, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -38,12 +43,14 @@ func PostRequest(url string, body io.Reader) (*http.Response, error) {
 func HeadRequest(url string) (*http.Response, error) {
 	r, err := http.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 

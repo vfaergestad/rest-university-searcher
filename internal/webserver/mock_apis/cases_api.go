@@ -2,7 +2,7 @@ package mock_apis
 
 import (
 	"assignment-2/internal/webserver/structs"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/encode_struct"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -49,7 +49,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	err = utility.EncodeStruct(w, response)
+	err = encode_struct.EncodeStruct(w, response)
 	if err != nil {
 		panic(err)
 	}

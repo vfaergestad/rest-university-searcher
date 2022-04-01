@@ -5,9 +5,8 @@ import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/structs"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/request"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -19,17 +18,17 @@ func Invoke(country string) {
 	// Checks if given alpha-code is a three letter string.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, country)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err)
 	} else if match {
 		country, err = country_cache.GetCountry(country)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err)
 		}
 	}
 
 	err = checkAndInvokeWebhooks(country)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err)
 	}
 }
 
@@ -57,12 +56,12 @@ func callWebhook(webhook structs.Webhook) {
 	body.Url = ""
 	result, err := json.Marshal(body)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
 	}
-	log.Println("Attempting invocation of url " + webhook.Url)
-	res, err := utility.PostRequest(webhook.Url, strings.NewReader(string(result)))
+	res, err := request.PostRequest(webhook.Url, strings.NewReader(string(result)))
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
+		return
 	}
 
 	// Read the response
@@ -72,6 +71,6 @@ func callWebhook(webhook structs.Webhook) {
 		return
 	}
 
-	fmt.Println("Webhook invoked. Received status code " + strconv.Itoa(res.StatusCode) +
-		" and body: " + string(response))
+	log.Println("Webhook invoked: " + webhook.Url + ". Received status code " + strconv.Itoa(res.StatusCode) +
+		" and response: " + string(response))
 }

@@ -5,7 +5,7 @@ import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/structs"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/encode_struct"
 	"encoding/json"
 	"net/http"
 	"path"
@@ -56,7 +56,7 @@ func getAllWebhooks(w http.ResponseWriter) {
 		}
 	}
 
-	err = utility.EncodeStruct(w, webhooks)
+	err = encode_struct.EncodeStruct(w, webhooks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -78,7 +78,7 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = utility.EncodeStruct(w, webhook)
+	err = encode_struct.EncodeStruct(w, webhook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -142,7 +142,7 @@ func registerWebhook(w http.ResponseWriter, r *http.Request) {
 	response := responseStruct{WebhookId: webhookId}
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if err = utility.EncodeStruct(w, response); err != nil {
+	if err = encode_struct.EncodeStruct(w, response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

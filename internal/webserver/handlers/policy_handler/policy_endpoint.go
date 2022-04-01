@@ -3,7 +3,7 @@ package policy_handler
 import (
 	"assignment-2/internal/webserver/cache/policy_cache"
 	"assignment-2/internal/webserver/constants"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/encode_struct"
 	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
@@ -65,7 +65,7 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = utility.EncodeStruct(w, policyResponseStruct)
+	err = encode_struct.EncodeStruct(w, policyResponseStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

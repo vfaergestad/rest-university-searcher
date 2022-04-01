@@ -4,10 +4,11 @@ package cases_api
 import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/request"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -39,6 +40,7 @@ func GetResponseStruct(country string) (structs.CasesResponse, error) {
 
 	// Checks if the response includes the correct country
 	if responseStruct.Data.Country.Name == "" {
+		log.Println(constants.GetCountryNotFoundInCasesApi(country))
 		return structs.CasesResponse{}, constants.GetCountryNotFoundInCasesApi(country)
 	}
 
@@ -79,13 +81,13 @@ func getResponse(country string) (*http.Response, error) {
 	// Encodes the query-struct into a json-byte-array
 	result, err := json.Marshal(query)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err)
 	}
 
 	// Sends the query to the cases-API and returns the response
-	res, err := utility.PostRequest(constants.CasesApiUrl, strings.NewReader(string(result)))
+	res, err := request.PostRequest(constants.CasesApiUrl, strings.NewReader(string(result)))
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err)
 	}
 	return res, nil
 
@@ -96,12 +98,13 @@ func decodeCases(res *http.Response, target structs.CasesApiResponse) (structs.C
 	// Reads the response from the cases-API and converts it to a byte-array
 	byteResult, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err)
 	}
 
 	// Decodes the byte-array into a struct and returns it
 	err = json.Unmarshal(byteResult, &target)
 	if err != nil {
+		log.Println(err)
 		return structs.CasesApiResponse{}, err
 	}
 	return target, nil
