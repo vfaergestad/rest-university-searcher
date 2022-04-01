@@ -4,7 +4,7 @@ import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
-	"assignment-2/internal/webserver/utility"
+	"assignment-2/internal/webserver/utility/encode_struct"
 	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
@@ -41,12 +41,11 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	countryQuery = strings.Title(countryQuery)
-
 	match, err = regexp.MatchString(constants.AlphaCodeRegex, countryQuery)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if match {
+		countryQuery = strings.ToUpper(countryQuery)
 		countryQuery, err = country_cache.GetCountry(countryQuery)
 		if err != nil {
 			switch err.Error() {
@@ -57,6 +56,8 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		}
+	} else {
+		countryQuery = strings.Title(strings.ToLower(countryQuery))
 	}
 
 	go webhooks.Invoke(countryQuery)
@@ -72,7 +73,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = utility.EncodeStruct(w, casesResponseStruct)
+	err = encode_struct.EncodeStruct(w, casesResponseStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
