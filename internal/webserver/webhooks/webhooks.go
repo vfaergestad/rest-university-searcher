@@ -33,7 +33,7 @@ func Invoke(country string) {
 }
 
 func checkAndInvokeWebhooks(country string) error {
-	webhooks, err := webhooks_db.GetAllWebHooks()
+	webhooks, err := webhooks_db.GetAllWebhooks()
 	if err != nil {
 		return err
 	}

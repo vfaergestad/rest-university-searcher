@@ -1,5 +1,7 @@
 package policy_api
 
+// Request_policies handles all requests and communications to the policy API.
+
 import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/structs"
@@ -12,28 +14,32 @@ import (
 	"regexp"
 )
 
+// GetStatusCode returns the status code of the API.
 func GetStatusCode() (int, error) {
-
 	res, err := request.HeadRequest(constants.PolicyApiStatusUrl)
 	if err != nil {
 		return -1, err
 	}
-
 	return res.StatusCode, nil
-
 }
 
+// GetStringencyAndPolicies returns the stringency and policies in the given country for the given scope.
+// The country must be given as a ISO 31661 alpha-3 code.
+// The scope must be a valid date in the format YYYY-MM-DD, and must be a year when covid existed.
 func GetStringencyAndPolicies(alphaCode string, year string, month string, day string) (float64, int, error) {
+	// Gets the response from the API.
 	policyResponse, err := getResponse(alphaCode, year, month, day)
 	if err != nil {
 		return -1, -1, err
 	}
 
+	// Checks if the response has any data
 	if policyResponse.StringencyData["msg"] == "Data unavailable" {
 		log.Println(errors.New(constants.PoliciesDataUnavailableError))
 		return -1, -1, errors.New(constants.PoliciesDataUnavailableError)
 	}
 
+	// Checks if the stringency-fields holds any values, and picks the right one.
 	var stringency float64
 	stringencyRaw := policyResponse.StringencyData["stringency_actual"]
 	if stringencyRaw == nil {
@@ -42,6 +48,7 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 		stringency = policyResponse.StringencyData["stringency_actual"].(float64)
 	}
 
+	// Checks how many policies there are. If there are only one, it checks if it is a valid policy.
 	policies := len(policyResponse.PolicyActions)
 	if policies == 1 {
 		if policyResponse.PolicyActions[0].PolicyTypeCode == "NONE" {
@@ -51,12 +58,7 @@ func GetStringencyAndPolicies(alphaCode string, year string, month string, day s
 	return stringency, policies, nil
 }
 
-// GetResponse
-// Possible custom-error-messages:
-// 					- MALFORMED_ALPHACODE_ERROR
-//					- MALFORMED_COVID_YEAR_ERROR
-//					- MALFORMED_MONTH_ERROR
-//					- MALFORMED_DAY_ERROR
+// getResponse returns the response from the API as a struct.
 func getResponse(alphaCode string, year string, month string, day string) (structs.PolicyApiResponse, error) {
 	// Checks if given alpha-code is a three letter string.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, alphaCode)
@@ -81,6 +83,7 @@ func getResponse(alphaCode string, year string, month string, day string) (struc
 		return structs.PolicyApiResponse{}, err
 	}
 
+	// Decodes the response to a struct.
 	policy, err := decodePolicy(res, structs.PolicyApiResponse{})
 	if err != nil {
 		return structs.PolicyApiResponse{}, err
@@ -90,6 +93,8 @@ func getResponse(alphaCode string, year string, month string, day string) (struc
 
 }
 
+// checkDate checks if the given date is valid.
+// The date must be a year when covid existed.
 func checkDate(year string, month string, day string) (bool, error) {
 	// Checks if given year is a valid covid year. (Between 2019 and 2030)
 	match, err := regexp.MatchString(constants.YearRegex, year)
@@ -124,6 +129,7 @@ func checkDate(year string, month string, day string) (bool, error) {
 	return true, nil
 }
 
+// decodePolicy decodes the response from the API to a struct.
 func decodePolicy(res *http.Response, target structs.PolicyApiResponse) (structs.PolicyApiResponse, error) {
 	decoder := json.NewDecoder(res.Body)
 	if err := decoder.Decode(&target); err != nil {

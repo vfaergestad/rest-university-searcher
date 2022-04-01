@@ -45,7 +45,7 @@ func getWebhook(w http.ResponseWriter, r *http.Request) {
 
 func getAllWebhooks(w http.ResponseWriter) {
 
-	webhooks, err := webhooks_db.GetAllWebHooks()
+	webhooks, err := webhooks_db.GetAllWebhooks()
 	if err != nil {
 		if err.Error() == constants.WebhookDBIsEmpty {
 			http.Error(w, err.Error(), http.StatusOK)

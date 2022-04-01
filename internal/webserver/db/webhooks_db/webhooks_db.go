@@ -1,5 +1,7 @@
 package webhooks_db
 
+// Webhooks_db handles all communication with the webhooks' collection in the database.
+
 import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
@@ -10,9 +12,11 @@ import (
 	"strings"
 )
 
+// collection is the name of the collection in the database.
 const collection = "webhooks"
 
-func GetAllWebHooks() ([]structs.Webhook, error) {
+// GetAllWebhooks returns all webhooks in the database.
+func GetAllWebhooks() ([]structs.Webhook, error) {
 	var resultSlice []structs.Webhook
 	dbEmpty := true
 
@@ -32,13 +36,13 @@ func GetAllWebHooks() ([]structs.Webhook, error) {
 
 		dbEmpty = false
 
+		// Converts the document to a webhook struct.
 		var webhook structs.Webhook
 		err = doc.DataTo(&webhook)
 		if err != nil {
 			return nil, err
 		}
 
-		// Creates a cache entry struct for each element, and puts it into the result map
 		resultSlice = append(resultSlice, webhook)
 
 	}
@@ -51,16 +55,20 @@ func GetAllWebHooks() ([]structs.Webhook, error) {
 	return resultSlice, nil
 }
 
+// GetWebhook returns the webhook with the given id.
 func GetWebhook(webhookId string) (structs.Webhook, error) {
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
 		return structs.Webhook{}, err
 	}
+
+	// Checks if the webhook exists in the database.
 	if !doc.Exists() {
 		return structs.Webhook{}, errors.New(constants.WebhookNotFoundError)
 	}
 
+	// Converts the document to a webhook struct.
 	var webhook structs.Webhook
 	err = doc.DataTo(&webhook)
 	if err != nil {
@@ -69,12 +77,18 @@ func GetWebhook(webhookId string) (structs.Webhook, error) {
 	return webhook, nil
 }
 
+// AddWebhook adds a webhook with the given url, country, and calls, to the database.
+// The count is set to 0, since it is a new webhook.
 func AddWebhook(url string, country string, calls int) (string, error) {
 	country = strings.Title(country)
+
+	// Hashes the webhook information to create a unique id.
 	webhookId := hash_util.HashWebhook(url, country, calls)
 
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, _ := res.Get(db.GetContext())
+
+	// Checks if the webhook already exists in the database.
 	if doc.Exists() {
 		return "", errors.New(constants.WebhookAlreadyExistingError)
 	}
@@ -93,8 +107,11 @@ func AddWebhook(url string, country string, calls int) (string, error) {
 	}
 }
 
+// UpdateWebhook updates the webhook with the given url, country, calls, and count.
 func UpdateWebhook(url string, country string, calls int, count int) (string, error) {
 	country = strings.Title(country)
+
+	// Hashes the webhook information to get the webhook id.
 	webhookId := hash_util.HashWebhook(url, country, calls)
 
 	res := db.GetClient().Collection(collection).Doc(webhookId)
@@ -113,9 +130,12 @@ func UpdateWebhook(url string, country string, calls int, count int) (string, er
 	}
 }
 
+// DeleteWebhook deletes the webhook with the given id.
 func DeleteWebhook(webhookId string) error {
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
+
+	// Checks if the webhook exists in the database.
 	if !doc.Exists() {
 		return errors.New(constants.WebhookNotFoundError)
 	}
@@ -128,6 +148,7 @@ func DeleteWebhook(webhookId string) error {
 	}
 }
 
+// GetDBSize returns the number of webhooks in the database.
 func GetDBSize() (int, error) {
 	res, err := db.GetClient().Collection(collection).Documents(db.GetContext()).GetAll()
 	if err != nil {

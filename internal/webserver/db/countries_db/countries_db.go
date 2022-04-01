@@ -1,5 +1,7 @@
 package countries_db
 
+// Countries_db handles all communication to the countries' collection in the database.
+
 import (
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/db"
@@ -12,8 +14,10 @@ import (
 	"time"
 )
 
+// collection is the name of the collection in the database.
 const collection = "countries"
 
+// GetAllCountries returns all country-entries in the database.
 func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 	resultMap := map[string]structs.CountryCacheEntry{}
 	dbEmpty := true
@@ -21,10 +25,8 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 	iter := db.GetClient().Collection(collection).Documents(db.GetContext())
 
 	for {
-		// Gets the next item in the collection
 		doc, err := iter.Next()
 
-		// Stops the loop if there is no more elements
 		if err == iterator.Done {
 			break
 		}
@@ -58,23 +60,9 @@ func GetAllCountries() (map[string]structs.CountryCacheEntry, error) {
 	return resultMap, nil
 }
 
-func GetCountry(alphaCode string) (string, error) {
-	res := db.GetClient().Collection(collection).Doc(alphaCode)
-	doc, err := res.Get(db.GetContext())
-	if err != nil {
-		return "", err
-	}
-
-	m := doc.Data()
-	country, exists := m["countryName"]
-	if !exists {
-		return "", errors.New(constants.CountryNotFoundError)
-	} else {
-		return country.(string), nil
-	}
-}
-
+// AddCountry adds a country to the database.
 func AddCountry(alphaCode string, countryName string) error {
+	// Checks if the alphaCode is valid
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, alphaCode)
 	if err != nil {
 		return err
@@ -95,6 +83,7 @@ func AddCountry(alphaCode string, countryName string) error {
 	}
 }
 
+// DeleteCountry deletes a country from the database.
 func DeleteCountry(alphaCode string) error {
 	_, err := db.GetClient().Collection(collection).Doc(alphaCode).Delete(db.GetContext())
 	if err != nil {
