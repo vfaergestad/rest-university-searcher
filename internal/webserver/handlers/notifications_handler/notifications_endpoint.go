@@ -32,10 +32,11 @@ func HandlerNotifications(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// getWebhook handles requests to get webhooks, either a single one, or all of them.
 func getWebhook(w http.ResponseWriter, r *http.Request) {
 	cleanPath := path.Clean(r.URL.Path)
 	pathList := strings.Split(cleanPath, "/")
-	// Check if the given path is valid
+	// Check if the given path is valid, and finds out if the request is for a single webhook or all of them.
 	switch len(pathList) {
 	case 4:
 		getAllWebhooks(w)
@@ -47,8 +48,9 @@ func getWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getAllWebhooks handler that responds with all the webhooks in the database.
 func getAllWebhooks(w http.ResponseWriter) {
-
+	// Gets all the webhooks from the database.
 	webhooks, err := webhooks_db.GetAllWebhooks()
 	if err != nil {
 		if err.Error() == constants.WebhookDBIsEmpty {
@@ -60,6 +62,7 @@ func getAllWebhooks(w http.ResponseWriter) {
 		}
 	}
 
+	// Encodes the webhooks to json and writes it to the response.
 	err = encode_struct.EncodeStruct(w, webhooks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -67,10 +70,13 @@ func getAllWebhooks(w http.ResponseWriter) {
 
 }
 
+// getSingleWebhook handles requests to get a single webhook.
 func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
+	// Finds the webhook id in the url.
 	cleanPath := path.Clean(r.URL.Path)
 	webhookId := path.Base(cleanPath)
 
+	// Gets the webhook from the database.
 	webhook, err := webhooks_db.GetWebhook(webhookId)
 	if err != nil {
 		if err.Error() == constants.WebhookNotFoundError {
@@ -82,6 +88,7 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Writes the webhook to the response.
 	err = encode_struct.EncodeStruct(w, webhook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -92,30 +99,37 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// RegisterWebhook handles requests to register a new webhook.
 func registerWebhook(w http.ResponseWriter, r *http.Request) {
+	// Struct for responding with the webhook id.
 	type responseStruct struct {
 		WebhookId string `json:"webhook_id"`
 	}
 
+	// Decodes the request body to a webhook.
 	var webhook structs.Webhook
 	decoder := json.NewDecoder(r.Body)
 	_ = decoder.Decode(&webhook)
 
+	// Checks if the webhook url is empty.
 	if webhook.Url == "" {
 		http.Error(w, "url cannot be empty", http.StatusBadRequest)
 		return
 	}
 
+	// Checks if the webhook country is empty.
 	if webhook.Country == "" {
 		http.Error(w, "country cannot be empty", http.StatusBadRequest)
 		return
 	}
 
+	// Checks if the webhook calls is empty.
 	if webhook.Calls < 1 {
 		http.Error(w, "calls must be 1 or greater", http.StatusBadRequest)
 		return
 	}
 
+	// Checks if the webhook country is an alpha code. If it is, the corresponding country is retrieved from the cache.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, webhook.Country)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,6 +146,7 @@ func registerWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Adds the webhook to the database.
 	webhookId, err := webhooks_db.AddWebhook(webhook.Url, webhook.Country, webhook.Calls)
 	if err != nil {
 		if err.Error() == constants.WebhookAlreadyExistingError {
@@ -143,6 +158,7 @@ func registerWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Encodes the webhook id to json and writes it to the response.
 	response := responseStruct{WebhookId: webhookId}
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -153,6 +169,7 @@ func registerWebhook(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// deleteWebhook handles requests to delete a webhook.
 func deleteWebhook(w http.ResponseWriter, r *http.Request) {
 	cleanPath := path.Clean(r.URL.Path)
 	pathList := strings.Split(cleanPath, "/")
@@ -162,8 +179,10 @@ func deleteWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extracts the webhook id from the url.
 	webhookId := path.Base(cleanPath)
 
+	// Deletes the webhook from the database.
 	err := webhooks_db.DeleteWebhook(webhookId)
 	if err != nil {
 		if err.Error() == constants.WebhookNotFoundError {
