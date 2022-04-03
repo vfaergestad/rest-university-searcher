@@ -1,5 +1,7 @@
 package notifications_handler
 
+// Notifications_endpoint handles al incoming traffic to the /corona/v1/notifications endpoint.
+
 import (
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
@@ -13,7 +15,9 @@ import (
 	"strings"
 )
 
+// HandlerNotifications is the entry point for the handler.
 func HandlerNotifications(w http.ResponseWriter, r *http.Request) {
+	// Checks which method is used, and redirects the request to the corresponding handler.
 	switch r.Method {
 	case http.MethodGet:
 		getWebhook(w, r)

@@ -12,9 +12,11 @@ import (
 var ctx context.Context
 var client *firestore.Client
 
+// InitializeFirestore Sets the context and client for Firestore.
 func InitializeFirestore() error {
 	ctx = context.Background()
 
+	// Creates the Firebase App using the service account credentials.
 	sa := option.WithCredentialsFile(constants.ServiceAccountLocation)
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
@@ -30,6 +32,7 @@ func InitializeFirestore() error {
 
 }
 
+// CloseFirestore Closes the Firestore client.
 func CloseFirestore() error {
 	err := client.Close()
 	if err != nil {
@@ -38,10 +41,12 @@ func CloseFirestore() error {
 	return nil
 }
 
+// GetContext Returns the Firestore context.
 func GetContext() context.Context {
 	return ctx
 }
 
+// GetClient Returns the Firestore client.
 func GetClient() *firestore.Client {
 	return client
 }
