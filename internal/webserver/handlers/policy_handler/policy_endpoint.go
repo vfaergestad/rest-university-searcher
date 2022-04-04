@@ -59,7 +59,7 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// Sets the date to the current time if no date is given.
-		timeNow := time.Now()
+		timeNow := time.Now().Add(time.Duration(-48) * time.Hour)
 		scope = timeNow.Format("2006-01-02")
 	}
 
@@ -68,6 +68,9 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if constants.IsBadRequestError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		} else if constants.IsNotFoundError(err) {
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
