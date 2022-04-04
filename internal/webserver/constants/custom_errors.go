@@ -27,6 +27,18 @@ const (
 	linkToDocs = "https://git.gvk.idi.ntnu.no/course/prog2005/prog2005-2022-workspace/vegarfae/assignment-2/-/blob/main/README.md"
 )
 
+func IsNotFoundError(err error) bool {
+	switch err.Error() {
+	case CountryNotFoundError,
+		PolicyNotFoundError,
+		WebhookNotFoundError,
+		PoliciesDataUnavailableError:
+		return true
+	default:
+		return false
+	}
+}
+
 func IsBadRequestError(err error) bool {
 	switch err.Error() {
 	case MalformedAlphaCodeError,
@@ -35,8 +47,7 @@ func IsBadRequestError(err error) bool {
 		MalformedDayError,
 		InvalidMethodError,
 		CountryNotFoundError,
-		PolicyNotFoundError,
-		PoliciesDataUnavailableError:
+		PolicyNotFoundError:
 		return true
 	default:
 		return false

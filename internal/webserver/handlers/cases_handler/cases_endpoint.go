@@ -76,6 +76,9 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 		if constants.IsBadRequestError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		} else if constants.IsNotFoundError(err) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
