@@ -12,6 +12,9 @@ func EncodeStruct(w http.ResponseWriter, target interface{}) error {
 	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "\t")
 	err := encoder.Encode(target)
-	log.Println(err)
-	return err
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
