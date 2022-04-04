@@ -1,5 +1,7 @@
 package policy_handler
 
+// Policy_handler is a handler for the /corona/v1/policy endpoint.
+
 import (
 	"assignment-2/internal/webserver/cache/policy_cache"
 	"assignment-2/internal/webserver/constants"
@@ -13,10 +15,13 @@ import (
 )
 
 const (
+	// validDateRegex is a regular expression for validating a date.
 	validDateRegex = "^\\d{4}-\\d{2}-\\d{2}$"
 )
 
+// HandlerPolicy is the entry point for the endpoint.
 func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
+	// Checks if the method is GET.
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)
 		return
@@ -35,10 +40,13 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 	// Defines the different queries in the url
 	countryQuery := path.Base(cleanPath)
 
+	// Invokes the webhook package to see if any webhooks needs to be counted up or needs to be invoked.
 	go webhooks.Invoke(countryQuery)
 
+	// Retrieves the date from the path
 	scope := r.URL.Query().Get("scope")
 
+	// Checks if the date is empty
 	if scope != "" {
 		// Check if the scope is a valid date.
 		match, err := regexp.MatchString(validDateRegex, scope)
@@ -50,10 +58,12 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
+		// Sets the date to the current time if no date is given.
 		timeNow := time.Now()
 		scope = timeNow.Format("2006-01-02")
 	}
 
+	// Retrieves the policy from the cache.
 	policyResponseStruct, err := policy_cache.GetPolicy(countryQuery, scope)
 	if err != nil {
 		if constants.IsBadRequestError(err) {
@@ -65,6 +75,7 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Encodes the policy response struct to json and writes it to the response.
 	err = encode_struct.EncodeStruct(w, policyResponseStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -14,8 +14,9 @@ import (
 	"strings"
 )
 
+// Invoke counts up webhooks for a given country, and invokes the ones that should be.
 func Invoke(country string) {
-	// Checks if given alpha-code is a three letter string.
+	// Checks if given alpha-code is a three letter string, and if it is, it converts it to a country name.
 	match, err := regexp.MatchString(constants.AlphaCodeRegex, country)
 	if err != nil {
 		log.Println(err)
@@ -32,6 +33,8 @@ func Invoke(country string) {
 	}
 }
 
+// checkAndInvokeWebhooks checks if there are any webhooks for the given country with the correct count,
+// and if there are, it invokes them.
 func checkAndInvokeWebhooks(country string) error {
 	webhooks, err := webhooks_db.GetAllWebhooks()
 	if err != nil {
@@ -51,6 +54,7 @@ func checkAndInvokeWebhooks(country string) error {
 	return nil
 }
 
+// callWebhook calls the given webhook.
 func callWebhook(webhook structs.Webhook) {
 	body := webhook
 	body.Url = ""

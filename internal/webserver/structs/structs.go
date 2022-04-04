@@ -2,6 +2,7 @@ package structs
 
 import "time"
 
+// CasesResponse is the response from the cases endpoint.
 type CasesResponse struct {
 	Country    string  `json:"country"`
 	Date       string  `json:"date"`
@@ -11,12 +12,14 @@ type CasesResponse struct {
 	GrowthRate float64 `json:"growth_rate"`
 }
 
+// CountryCacheEntry is the cache entry for a country.
 type CountryCacheEntry struct {
 	AlphaCode   string
 	CountryName string
 	Time        time.Time
 }
 
+// PolicyResponse is the response from the policy endpoint.
 type PolicyResponse struct {
 	CountryCode string    `json:"country_code"`
 	Scope       string    `json:"scope"`
@@ -25,6 +28,7 @@ type PolicyResponse struct {
 	Time        time.Time `json:"-"`
 }
 
+// Webhook holds information about a webhook.
 type Webhook struct {
 	WebhookId string `json:"webhook_id"`
 	Url       string `json:"url,omitempty"`
@@ -33,6 +37,7 @@ type Webhook struct {
 	Count     int    `json:"-"`
 }
 
+// CasesApiResponse is the response from the cases api.
 type CasesApiResponse struct {
 	Data Data `json:"data"`
 }
@@ -54,6 +59,7 @@ type MostRecentStruct struct {
 	GrowthRate float64 `json:"growthRate"`
 }
 
+// PolicyApiResponse is the response from the policy api.
 type PolicyApiResponse struct {
 	PolicyActions  []PolicyAction         `json:"policyActions"`
 	StringencyData map[string]interface{} `json:"stringencyData"`

@@ -1,5 +1,7 @@
 package mock_apis
 
+// cases_api is a mock API of the cases API for testing purposes.
+
 import (
 	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility/encode_struct"
@@ -13,8 +15,10 @@ type queryStruct struct {
 	Query string `json:"query"`
 }
 
+// HandlerCases is the entry point of the mock api.
 func HandlerCases(w http.ResponseWriter, r *http.Request) {
 
+	// Get the query from the request.
 	var query queryStruct
 	err := json.NewDecoder(r.Body).Decode(&query)
 	if err != nil {
@@ -22,6 +26,8 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var response structs.CasesApiResponse
+
+	// Checks if the query contains "Taiwan", and returns an empty struct.
 	if strings.Contains(query.Query, "Taiwan") {
 		response = structs.CasesApiResponse{Data: structs.Data{
 			Country: structs.CountryStruct{
@@ -35,6 +41,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 				},
 			}}}
 	} else {
+		// Responds with a standard response.
 		response = structs.CasesApiResponse{Data: structs.Data{
 			Country: structs.CountryStruct{
 				Name: "Norway",
@@ -49,6 +56,7 @@ func HandlerCases(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	// Encode the response to JSON and write it to the response.
 	err = encode_struct.EncodeStruct(w, response)
 	if err != nil {
 		panic(err)

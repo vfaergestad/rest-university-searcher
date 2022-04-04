@@ -15,11 +15,14 @@ import (
 )
 
 const (
+	// defaultPort is the default port of the webserver.
 	defaultPort = "8080"
 )
 
+// InitServer initializes the webserver.
 func InitServer() {
 
+	// Initialize the database.
 	err := db.InitializeFirestore()
 	if err != nil {
 		panic(err)
@@ -32,6 +35,7 @@ func InitServer() {
 		}
 	}()
 
+	// Initialize the country cache.
 	err = country_cache.InitCache()
 	if err != nil {
 		panic(err)

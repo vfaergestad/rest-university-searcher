@@ -16,6 +16,7 @@ func Init() {
 	startTime = time.Now()
 }
 
+// GetUptimeString returns the uptime of the server as a string
 func GetUptimeString() string {
 	return time.Since(startTime).Round(time.Second).String()
 }

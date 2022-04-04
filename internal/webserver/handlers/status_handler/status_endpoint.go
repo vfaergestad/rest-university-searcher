@@ -1,5 +1,7 @@
 package status_handler
 
+// Status_handler handles the corona/v1/status endpoint.
+
 import (
 	"assignment-2/internal/webserver/api_requests/cases_api"
 	"assignment-2/internal/webserver/api_requests/countries_api"
@@ -10,6 +12,7 @@ import (
 	"net/http"
 )
 
+// Struct for holding information to respond with.
 type statusResponse struct {
 	CasesApi   int    `json:"cases_api"`
 	PolicyApi  int    `json:"policy_api"`
@@ -19,6 +22,7 @@ type statusResponse struct {
 	Uptime     string `json:"uptime"`
 }
 
+// HandlerStatus is the entry point for the endpoint.
 func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 
 	// Responds with error if method is anything else than GET.
@@ -27,11 +31,13 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Retrieves the status codes from the APIs.
 	policyStatus, _ := policy_api.GetStatusCode()
 	countryStatus, _ := countries_api.GetStatusCode()
 	casesStatus, _ := cases_api.GetStatusCode()
 	webhooks, _ := webhooks_db.GetDBSize()
 
+	// Creates a new statusResponse struct with the retrieved status codes and other information.
 	response := statusResponse{
 		CasesApi:   casesStatus,
 		PolicyApi:  policyStatus,
@@ -41,6 +47,7 @@ func HandlerStatus(w http.ResponseWriter, r *http.Request) {
 		Uptime:     uptime.GetUptimeString(),
 	}
 
+	// Encodes the response struct to JSON, and writes it to the response.
 	err := encode_struct.EncodeStruct(w, response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
