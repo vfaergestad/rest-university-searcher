@@ -95,7 +95,8 @@ Path: /corona/v1/policy/{:country_code}{?scope=YYYY-MM-DD}
 
 ```{:country_code}``` is the ISO 3166-1 alpha-3 code of the country for which the information is requested.  
 ```{?scope=YYYY-MM-DD}``` is optional, and if present, it is the date for which policy stringency information is 
-requested. If no scope is given, the latest policy stringency information is returned.
+requested. If no scope is given, the latest policy stringency information is returned. If there is no avalable data
+for the last 7 days, an error is returned.
 
 Example request: ```/corona/v1/policy/NOR?scope=2022-04-03```
 
