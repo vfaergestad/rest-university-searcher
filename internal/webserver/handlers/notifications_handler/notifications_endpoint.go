@@ -80,7 +80,7 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 	webhook, err := webhooks_db.GetWebhook(webhookId)
 	if err != nil {
 		if err.Error() == constants.WebhookNotFoundError {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -92,9 +92,6 @@ func getSingleWebhook(w http.ResponseWriter, r *http.Request) {
 	err = encode_struct.EncodeStruct(w, webhook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		http.Error(w, "", http.StatusOK)
-		return
 	}
 
 }
@@ -186,13 +183,14 @@ func deleteWebhook(w http.ResponseWriter, r *http.Request) {
 	err := webhooks_db.DeleteWebhook(webhookId)
 	if err != nil {
 		if err.Error() == constants.WebhookNotFoundError {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
+		// TODO: Response as JSON?
 		http.Error(w, "webhook deleted", http.StatusOK)
 		return
 	}
