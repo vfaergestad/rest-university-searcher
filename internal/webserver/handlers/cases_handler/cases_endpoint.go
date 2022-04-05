@@ -7,6 +7,7 @@ import (
 	"assignment-2/internal/webserver/cache/country_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/utility/encode_struct"
+	"assignment-2/internal/webserver/utility/logging"
 	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
@@ -16,6 +17,7 @@ import (
 
 // HandlerCases handler entrypoint.
 func HandlerCases(w http.ResponseWriter, r *http.Request) {
+	logging.LogRequest(r)
 	// Check if the method is GET.
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)

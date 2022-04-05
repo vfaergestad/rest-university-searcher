@@ -8,6 +8,7 @@ import (
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/structs"
 	"assignment-2/internal/webserver/utility/encode_struct"
+	"assignment-2/internal/webserver/utility/logging"
 	"encoding/json"
 	"net/http"
 	"path"
@@ -17,6 +18,7 @@ import (
 
 // HandlerNotifications is the entry point for the handler.
 func HandlerNotifications(w http.ResponseWriter, r *http.Request) {
+	logging.LogRequest(r)
 	// Checks which method is used, and redirects the request to the corresponding handler.
 	switch r.Method {
 	case http.MethodGet:

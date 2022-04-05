@@ -6,6 +6,7 @@ import (
 	"assignment-2/internal/webserver/cache/policy_cache"
 	"assignment-2/internal/webserver/constants"
 	"assignment-2/internal/webserver/utility/encode_struct"
+	"assignment-2/internal/webserver/utility/logging"
 	"assignment-2/internal/webserver/webhooks"
 	"net/http"
 	"path"
@@ -21,6 +22,7 @@ const (
 
 // HandlerPolicy is the entry point for the endpoint.
 func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
+	logging.LogRequest(r)
 	// Checks if the method is GET.
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)

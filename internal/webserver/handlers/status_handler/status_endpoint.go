@@ -8,6 +8,7 @@ import (
 	"assignment-2/internal/webserver/api_requests/policy_api"
 	"assignment-2/internal/webserver/db/webhooks_db"
 	"assignment-2/internal/webserver/utility/encode_struct"
+	"assignment-2/internal/webserver/utility/logging"
 	"assignment-2/internal/webserver/utility/uptime"
 	"net/http"
 )
@@ -24,7 +25,7 @@ type statusResponse struct {
 
 // HandlerStatus is the entry point for the endpoint.
 func HandlerStatus(w http.ResponseWriter, r *http.Request) {
-
+	logging.LogRequest(r)
 	// Responds with error if method is anything else than GET.
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method is not supported. Currently only GET are supported.", http.StatusMethodNotAllowed)
