@@ -33,7 +33,7 @@ Example request: ```/corona/v1/cases/Norway```
 
 #### Response
 
-Content type: ```application/json```
+Content type: ```application/json```  
 Status codes:
 - 200: Success
 - 400: Bad request; something was wrong with the request, like missing the country name, or to many parameters.
@@ -102,7 +102,7 @@ Example request: ```/corona/v1/policy/NOR?scope=2022-04-03```
 
 #### Response
 
-Content type: ```application/json```
+Content type: ```application/json```  
 Status codes:
 - 200: Success
 - 400: Bad request; something was wrong with the request, like missing the country name, wrong date format, or to many parameters.
@@ -386,3 +386,31 @@ Response:
     }
 ]
 ```
+
+## Deployment
+
+
+## Design choices
+
+
+## Extra features
+
+- Caching of country names and country codes.
+- Caching of policies
+- Cache entries has expire date
+- Logging
+
+
+## Edge cases
+
+### Resolved
+
+- Policy API data unavailable for today's date.
+- Policy API responding with an empty policy when no policy is active.
+
+### Not resolved
+
+- Cases API using other country names than the country API.
+
+## Further improvements
+
