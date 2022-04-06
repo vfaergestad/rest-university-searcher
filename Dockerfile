@@ -45,3 +45,5 @@ COPY --from=alpine:latest /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Instantiate server
 CMD ["./server"]
+
+# Time zone and cert inspired from https://github.com/jeremyhuiskamp/golang-docker-scratch/blob/main/Dockerfile.externaltz
