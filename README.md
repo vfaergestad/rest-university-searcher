@@ -389,6 +389,64 @@ Response:
 
 ## Deployment
 
+The is deployed on: http://10.212.137.224:8080/corona/v1/ . This can be reached only internally on
+NTNU's internal network. The application is running on a Docker container, on a VM hosted on SkyHigh.
+
+If you want to run the application locally, you can either create a Docker container, or compile and run the source code.
+
+### Compilation requirements
+
+For the application to be able to compile, you need to add the following files to the project.
+
+#### Google firestore service account key
+
+Name: ```serviceAccountKey.json```  
+Location: ```/assignment-2/serviceaccountkey.json```  
+
+This can be acquired from the Google Firebase Console.
+
+#### Hash secret
+
+Name: ```secret.go```  
+Location: ```/assignment-2/internal/utility/hash_util/secret.go```
+
+Content:
+```go
+package hash_util
+
+var hashSecret = []byte("YOUR_SECRET_HERE")
+
+func getHashSecret() []byte {
+	return hashSecret
+}
+```
+
+### Deployment in Docker
+
+Follow these steps to run the API on Docker:
+
+1. Clone the repository.
+2. Make sure to meet the compilation requirements.
+3. Install the following packages on the machine:
+    - docker.io
+    - docker-compose
+4. Open a terminal window, and navigate to the ```/assignment-2/``` directory.
+5. Run the following command to create and run the Docker container:
+    - docker-compose up -d
+
+The docker container is now running on port 8080 on the local machine.
+
+
+### Deployment by compiling and running the source code
+
+Follow these steps to compile and run the source code:
+1. Clone the repository.
+2. Make sure to meet the compilation requirements.
+3. Open a terminal window, and navigate to the ```/assignment-2/``` directory.
+4. Run the following command to compile and run the source code:
+    - ```go run cmd/main.go```
+
+The application is now running on port 8080 on the local machine.
 
 ## Design choices
 
