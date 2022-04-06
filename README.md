@@ -239,7 +239,7 @@ Body:
 
 Request: ```/corona/v1/notifications/```  
 Body: 
-```
+```json
 {
     "url": "https://example.com/notification", 
     "country": "NOR", 
