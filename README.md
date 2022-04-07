@@ -9,7 +9,7 @@ about Corona cases occurring in different countries, as well as the number and s
 ## Endpoints
 
 The service is provided by the following endpoints:
-```
+```text
 /corona/v1/cases/
 /corona/v1/policy/
 /corona/v1/status/
@@ -42,9 +42,9 @@ Status codes:
 - 500: Internal server error; something went wrong with the server.
 
 Body:
-```
+```text
 {
-    "country": <contry_name>,        (string)
+    "country": <country_name>,        (string)
     "date": <scope>,                 (string)
     "confirmed": <confirmed_cases>,  (int)
     "recovered": <recovered_cases>,  (int)
@@ -111,7 +111,7 @@ Status codes:
 - 500: Internal server error; something went wrong with the server.
 
 Body:
-```
+```text
 {
     "country": <country_name>,        (string)
     "date": <scope>,                  (string)
@@ -162,7 +162,7 @@ Status codes:
 - 500: Internal server error; something went wrong with the server.
 
 Body:
-```
+```text
 {
    "cases_api": "<http status code for *Covid 19 Cases API*>",              (int)
    "policy_api": "<http status code for *Corona Policy Stringency API*>",   (int)
@@ -206,7 +206,7 @@ Path: /corona/v1/notifications/
 Content type: ```application/json```
 
 Body:
-```
+```text
 {
     "url": {url},                   (string)
     "country": {country},           (string)
@@ -311,7 +311,7 @@ Status codes:
 - 500: Internal server error; something went wrong with the server.
 
 Body:
-```
+```text
 {
     "webhook_id": <webhook_id>,     (string)
     "url": <url>,                   (string)
@@ -353,7 +353,7 @@ Status codes:
 - 500: Internal server error; something went wrong with the server.
 
 Body:
-```
+```text
 [
     {
         "webhook_id": <webhook_id>,     (string)
@@ -450,14 +450,138 @@ The application is now running on port 8080 on the local machine.
 
 ## Design choices
 
+### Project structure and dependencies
+
+The project is structured in the following way: (files not shown)
+
+```text
+├───cmd                                                                    
+├───docs                                                                   
+└───internal
+    └───webserver
+        ├───api_requests
+        │   ├───cases_api
+        │   ├───countries_api
+        │   └───policy_api
+        ├───cache
+        │   ├───country_cache
+        │   └───policy_cache
+        ├───constants
+        ├───db
+        │   ├───countries_db
+        │   ├───policies_db
+        │   └───webhooks_db
+        ├───handlers
+        │   ├───cases_handler
+        │   ├───default_handler
+        │   ├───notifications_handler
+        │   ├───policy_handler
+        │   └───status_handler
+        ├───mock_apis
+        ├───structs
+        ├───utility
+        │   ├───encode_struct
+        │   ├───hash_util
+        │   ├───logging
+        │   ├───request
+        │   └───uptime
+        └───webhooks
+```
+
+The project structure was created with the goal of responsibility driven design,
+and to minimize code duplication overall.
+
+The different parts of the program is divided into packages after what responsibility they have, like the handlers
+package, which handles the requests from the clients. The handlers package contains the different handlers for the
+different endpoints.
+
+This way of abstracting the program makes it somewhat more difficult to keep track of the dependencies between
+the different packages. To gain overview of the dependencies, the following diagram is made:
+
+![Dependencies-diagram](docs/dependencies.png)
+
+The utility package is not added to this diagram, since they have dependencies to very many other packages, and therefore
+would make the diagram difficult to read.
+
+### Limiting API-requests
+
+When designing the functions in the program, there was a goal to reduce the number of
+requests sent to the APIs to a reasonable limit.
+
+#### Cache
+
+One way this was achieved was by implementing a cache.
+The program caches the results of some types of API-requests, and when the same request is made again, the result is 
+returned from the cache instead of making a new request.
+The program caches the results of the countries API, and the policies API.
+
+The cache is stored in a database, so the cache stays persistent between restarts of the program.
+
+This flowchart shows an example of how to cache works:
+
+![Cache-flowchart](docs/cache-flowchart.svg)
+
+#### Query validation
+
+Another way to reduce the number of API-requests was to validate the queries before sending them to the APIs.
+This reduces the amount of requests sent to the APIs, and the requests that are sent has a bigger chance of giving
+a valid response.
+
+### Testing
+
+The application is tested, using automated testing facilities provided by Golang, to ensure that the program is
+working as intended. Unit-tests written in the table-driven testing style was used. Each test 
+resides inside the same package as the units that are being tested, that ensures that also private functions can be tested.
+
+The table-driven testing style is used, since it creates an easy to understand and maintainable test suite, with easy 
+opportunities to add new tests. 
+
+The different APIs used in the application were mocked during testing, to ensure predictable responses, 
+and to ensure that the program is not sending requests to the real APIs, which helps the rate-limiting problem.
 
 ## Extra features
 
-- Caching of country names and country codes.
-- Caching of policies
-- Cache entries has expire date
-- Logging
+### Caching country data
 
+Beyond the caching that was specified in the assignment, the application also caches which alpha-3 codes the
+different countries have. This achieves faster response times, and fewer requests to the country API.
+
+### Using Go routines
+
+When webhooks was implemented, the response time of the application was increased, since the program had to check the
+webhooks, count up the number of invocations, and then trigger the correct webhooks.
+By using a go routine for starting this process, and another one for triggering the webhooks, the response time
+was significantly reduced.
+
+### Cache entries expiration
+
+When caching data from the APIs, there is a possibility that some entries will become outdated, when the APIs
+update their data. Therefore, each cache entry has a timestamp of when the entry was created. Each time the 
+entry is accessed, the timestamp is checked against a set expire limit. If the entry is older than the expiry limit,
+the entry is removed from the cache, and a new entry is requested from the APIs.
+
+### Logging
+
+In order to have an overview of which requests are being made, the program logs where each request comes from, what
+the requested URL is, and which method was used. This is printed out to the console while the program is running.
+
+Example:
+```text
+2022/04/07 13:03:09 10.24.100.231:1124 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
+2022/04/07 13:03:17 10.27.89.203:5313 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
+2022/04/07 13:03:24 10.24.100.231:1124 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
+2022/04/07 13:43:12 10.27.89.203:5313 - - GET /corona/v1/cases/RWA HTTP/1.1
+2022/04/07 13:43:53 89.102.3.112:2312 - - GET /corona/v1/cases/RWA HTTP/1.1
+2022/04/07 14:09:59 89.102.3.112:2312 - - GET /corona/v1/cases/NOR HTTP/1.1
+2022/04/07 14:10:03 10.27.89.203:5313 - - GET /corona/v1/cases/status HTTP/1.1
+2022/04/07 14:10:24 10.24.100.231:1124 - - GET /corona/v1/cases/RWA HTTP/1.1
+2022/04/07 14:10:29 89.102.3.112:2312 - - GET /corona/v1/cases/FRA HTTP/1.1
+2022/04/07 14:10:32 10.24.100.231:1124 - - GET /corona/v1/status/ HTTP/1.1
+2022/04/07 14:10:48 10.27.89.203:5313 - - GET /corona/v1/policy/RUS HTTP/1.1
+2022/04/07 14:11:04 89.102.3.112:2312 - - GET /corona/v1/policy/RUS?scope=2021-10-05 HTTP/1.1
+2022/04/07 14:11:14 10.27.89.203:5313 - - GET /corona/v1/policy/RUS?scope=2021-09-22 HTTP/1.1
+2022/04/07 14:11:29 10.24.100.231:1124 - - GET /corona/v1/policy/DNK?scope=2021-09-22 HTTP/1.1
+```
 
 ## Edge cases
 
