@@ -713,3 +713,15 @@ the endpoints. Therefore, the main functionality of all packages is tested in va
 To be able to hash different IDs for the database, the program uses a secret hash key. This key is now stored in a
 go file, with an accessor function that can be used to get the key. When the project is cloned, you would have to
 rewrite this file (see [hash secret](#hash-secret)). This is done to ensure that the key is not stored in the repository.
+
+### Error responding
+
+When an error occurs in the API, it responds with the correct error message as plain text, which is readable for the user.
+A better alternative could be to return the error message as JSON, to make it more readable for machines.
+
+Example:
+```json
+{
+   "error": "The API responded with an error."
+}
+```
