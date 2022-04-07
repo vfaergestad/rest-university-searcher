@@ -22,7 +22,7 @@ func GetStatusCode() (int, error) {
 	res, err := request.HeadRequest(constants.CountryAPIUrl + "all")
 	if err != nil {
 		log.Println(err)
-		return -1, err
+		return http.StatusBadGateway, err
 	}
 	return res.StatusCode, nil
 }
