@@ -13,7 +13,7 @@ import (
 )
 
 // collection is the name of the collection in the database.
-const collection = "webhooks"
+var collection = "webhooks"
 
 // GetAllWebhooks returns all webhooks in the database.
 func GetAllWebhooks() ([]structs.Webhook, error) {
@@ -60,7 +60,7 @@ func GetWebhook(webhookId string) (structs.Webhook, error) {
 	res := db.GetClient().Collection(collection).Doc(webhookId)
 	doc, err := res.Get(db.GetContext())
 	if err != nil {
-		return structs.Webhook{}, err
+		return structs.Webhook{}, errors.New(constants.WebhookNotFoundError)
 	}
 
 	// Checks if the webhook exists in the database.
@@ -155,4 +155,19 @@ func GetDBSize() (int, error) {
 		return -1, err
 	}
 	return len(res), nil
+}
+
+func SetUpTestDatabase() []string {
+	collection = "testing"
+	webhooks, _ := GetAllWebhooks()
+	for _, webhook := range webhooks {
+		_ = DeleteWebhook(webhook.WebhookId)
+	}
+
+	id1, _ := AddWebhook("https://example.com", "Norway", 1)
+	id2, _ := AddWebhook("https://example2.com", "Sweden", 2)
+	id3, _ := AddWebhook("https://example3.com", "Denmark", 3)
+
+	return []string{id1, id2, id3}
+
 }

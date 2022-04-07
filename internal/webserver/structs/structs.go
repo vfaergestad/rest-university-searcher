@@ -30,10 +30,10 @@ type PolicyResponse struct {
 
 // Webhook holds information about a webhook.
 type Webhook struct {
-	WebhookId string `json:"webhook_id"`
+	WebhookId string `json:"webhook_id,omitempty"`
 	Url       string `json:"url,omitempty"`
-	Country   string `json:"country"`
-	Calls     int    `json:"calls"`
+	Country   string `json:"country,omitempty"`
+	Calls     int    `json:"calls,omitempty"`
 	Count     int    `json:"-"`
 }
 
