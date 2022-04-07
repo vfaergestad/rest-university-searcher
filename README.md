@@ -434,7 +434,7 @@ Example body:
 
 ## Deployment
 
-The is deployed on: http://10.212.137.224/corona/v1/ . This can be reached only internally on
+The is deployed on: http://10.212.137.224/corona/v1/ . This can be reached only on
 NTNU's internal network. The application is running on a Docker container, on a VM hosted on SkyHigh.
 
 If you want to run the application locally, you can either create a Docker container, or compile and run the source code.
@@ -605,7 +605,7 @@ was significantly reduced.
 In order to have an overview of which requests are being made, the program logs where each request comes from, what
 the requested URL is, and which method was used. This is printed out to the console while the program is running.
 
-Example:
+Example: (with made up ip-addresses)
 ```text
 2022/04/07 13:03:09 10.24.100.231:1124 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
 2022/04/07 13:03:17 10.27.89.203:5313 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
