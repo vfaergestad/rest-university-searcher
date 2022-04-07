@@ -31,7 +31,6 @@ func TestDefaultEndpoint(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			// TODO: HVA ER BEST, DETTE, ELLER SÅNN JEG HAR GJORT ELLERS
 			rr := httptest.NewRecorder()
 			handler := http.HandlerFunc(HandlerDefault)
 			handler.ServeHTTP(rr, req)
