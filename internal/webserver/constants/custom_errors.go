@@ -18,7 +18,7 @@ const (
 	CountryDBIsEmpty             = "the country database is empty"
 	PolicyNotInCacheError        = "policy not in cache"
 	PolicyNotFoundError          = "policy not found"
-	PoliciesDataUnavailableError = "data unavailable in policy-api"
+	PoliciesDataUnavailableError = "data unavailable in policy-api. Check that the country code/scope is correct"
 	WebhookDBIsEmpty             = "webhook db is empty"
 	WebhookNotFoundError         = "webhook not found"
 	WebhookAlreadyExistingError  = "webhook exists already"
