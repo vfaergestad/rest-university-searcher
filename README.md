@@ -1,6 +1,6 @@
 # Assignment 2: REST-Covid-Info
 
-Deployed service: http://10.212.137.224. (Only available on the NTNU internal network)
+Deployed service: http://10.212.137.224/corona/v1/. (Only available on the NTNU internal network)
 
 This project is a submission to the second assignment in PROG-2005: Cloud Technologies. 
 It is a REST web application in Golang that provides the client with the ability to retrieve information 
