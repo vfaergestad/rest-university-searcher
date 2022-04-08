@@ -192,7 +192,6 @@ func deleteWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		// TODO: Response as JSON?
 		http.Error(w, "webhook deleted", http.StatusOK)
 		return
 	}

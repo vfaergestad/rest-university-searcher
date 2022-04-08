@@ -1,8 +1,25 @@
 # Assignment 2: REST-Covid-Info
 
+Deployed service: http://10.212.137.224/corona/v1/. (Only available on the NTNU internal network)
+
 This project is a submission to the second assignment in PROG-2005: Cloud Technologies. 
 It is a REST web application in Golang that provides the client with the ability to retrieve information 
 about Corona cases occurring in different countries, as well as the number and stringency of current policies in place.
+
+Webhooks are also supported, for receiving updates based on how frequent a specific country is invoked.
+
+The API depends on the following external services:
+
+- The [Oxford COVID-19 Government Response Tracker](https://covidtracker.bsg.ox.ac.uk/) provides information about 
+which policies are in place in different countries, and the stringency of those policies.
+- The [Covid19 GraphQl API](https://covid19-graphql.now.sh/) by [rlindskog](https://github.com/rlindskog) provides 
+information about the number of cases in different countries. ([Documentation and more info](https://github.com/rlindskog/covid19-graphql))
+- The [Rest Countries API](https://restcountries.com/) by [Alejandro Matos](https://gitlab.com/amatos) provides 
+conversion between ISO 3166-1 alpha-3 country codes and country names. ([Documentation and more info](https://gitlab.com/amatos/rest-countries))
+
+Thank you to all developers who develop open source and free to use APIs like these.
+
+## Table of Contents
 
 [TOC]
 
@@ -387,9 +404,41 @@ Response:
 ]
 ```
 
+### Triggered Webhook
+
+The following describes the request that is sent when a webhook is triggered.
+
+##### Request
+
+```
+Method: POST
+Path: <url specified in the corresponding webhook registration>
+```
+
+- Content type: ```application/json```
+
+Body:
+```Text
+{
+    "webhook_id": <webhook id made during registration>,                            (string)
+    "country": <country specified in the corresponding webhook registration>,       (string)
+    "calls": <number of calls specified in the corresponding webhook registration>, (int)
+}
+
+```
+
+Example body:
+```json
+{
+    "webhook_id": "d99f52fa1eac2495f8b980e33a848e04823af7926b9363c036ae096be3dc37a5",
+    "country": "Norway",
+    "calls": 3
+}
+```
+
 ## Deployment
 
-The is deployed on: http://10.212.137.224:8080/corona/v1/ . This can be reached only internally on
+The is deployed on: http://10.212.137.224/corona/v1/ . This can be reached only on
 NTNU's internal network. The application is running on a Docker container, on a VM hosted on SkyHigh.
 
 If you want to run the application locally, you can either create a Docker container, or compile and run the source code.
@@ -450,6 +499,8 @@ The application is now running on port 8080 on the local machine.
 
 ## Design choices
 
+This API is made as close to the assignment specification as possible, with some extra features. (See [Extra features](#extra-features))
+
 ### Project structure and dependencies
 
 The project is structured in the following way: (files not shown)
@@ -488,8 +539,8 @@ The project is structured in the following way: (files not shown)
         └───webhooks
 ```
 
-The project structure was created with the goal of responsibility driven design,
-and to minimize code duplication overall.
+The project structure was created with the goal of responsibility driven design, loose coupling, high cohesion, 
+ease of maintenance, and to minimize code duplication overall.
 
 The different parts of the program is divided into packages after what responsibility they have, like the handlers
 package, which handles the requests from the clients. The handlers package contains the different handlers for the
@@ -498,7 +549,7 @@ different endpoints.
 This way of abstracting the program makes it somewhat more difficult to keep track of the dependencies between
 the different packages. To gain overview of the dependencies, the following diagram is made:
 
-![Dependencies-diagram](docs/dependencies.png)
+![Dependencies-diagram](docs/dependency-diagram.png)
 
 The utility package is not added to this diagram, since they have dependencies to very many other packages, and therefore
 would make the diagram difficult to read.
@@ -553,19 +604,12 @@ webhooks, count up the number of invocations, and then trigger the correct webho
 By using a go routine for starting this process, and another one for triggering the webhooks, the response time
 was significantly reduced.
 
-### Cache entries expiration
-
-When caching data from the APIs, there is a possibility that some entries will become outdated, when the APIs
-update their data. Therefore, each cache entry has a timestamp of when the entry was created. Each time the 
-entry is accessed, the timestamp is checked against a set expire limit. If the entry is older than the expiry limit,
-the entry is removed from the cache, and a new entry is requested from the APIs.
-
 ### Logging
 
 In order to have an overview of which requests are being made, the program logs where each request comes from, what
 the requested URL is, and which method was used. This is printed out to the console while the program is running.
 
-Example:
+Example: (with made up ip-addresses)
 ```text
 2022/04/07 13:03:09 10.24.100.231:1124 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
 2022/04/07 13:03:17 10.27.89.203:5313 - - GET /corona/v1/policy/UGA?scope=2021-03-02 HTTP/1.1
@@ -583,16 +627,105 @@ Example:
 2022/04/07 14:11:29 10.24.100.231:1124 - - GET /corona/v1/policy/DNK?scope=2021-09-22 HTTP/1.1
 ```
 
+### Docker Compose
+
+For ease of deployment, a [docker-compose file](docker-compose.yml) is written, which contains the necessary information to run the
+application in a docker container. 
+
+### Adv. Task: Cases Endpoint allows alpha-3 codes
+
+The Policy endpoint allows for the alpha-3 codes of the countries to be specified. This is done by converting the alpha-3
+code to the country name using the REST countries API, and then using the country name to get the policy.
+
+### Adv. Task: Cache entries expiration
+
+When caching data from the APIs, there is a possibility that some entries will become outdated, when the APIs
+update their data. Therefore, each cache entry has a timestamp of when the entry was created. Each time the
+entry is accessed, the timestamp is checked against a set expire limit. If the entry is older than the expiry limit,
+the entry is removed from the cache, and a new entry is requested from the APIs.
+
+### Adv. Task: unified handling of country name in Webhooks
+
+When a webhook is registered, counted, or triggered, the program uses a unified handling of country names and alpha-3 codes.
+
 ## Edge cases
 
 ### Resolved
 
-- Policy API data unavailable for today's date.
-- Policy API responding with an empty policy when no policy is active.
+#### Policy API unavailable for current date
+
+The policy API does not have data for the current date for any country. Sometimes even yesterday, or even a day before, 
+has any data. Therefore, instead of defaulting to requesting the policy for the current date when no scope is given, 
+the program will check the last 7 days for any data, and pick the latest one. This ensures that the default 
+request without scope always responds the latest data.
+
+#### When no policies are active
+
+If the policy API is queried with a country and scope where there are no policies active, the API responds with the 
+following response:
+```json
+{
+   "policyActions": [
+      {
+         "policy_type_code": "NONE",
+         "policy_type_display": "No data.  Data may be inferred for last 7 days.",
+         "flag_value_display_field": "",
+         "policy_value_display_field": "No data.  Data may be inferred for last 7 days.",
+         "policyvalue": 0,
+         "flagged": null,
+         "notes": null
+      }
+   ]
+}
+```
+
+Therefore, the program cannot simply count the length of the policyActions array, since the one that is in there,
+tells us that there are no policies active. Instead, the program will check if the policy_type_code is equal to "NONE",
+and if it is, set the active policies to 0.
 
 ### Not resolved
 
-- Cases API using other country names than the country API.
+#### Difference in country name standards
+
+For conversion between country codes and country names, the API uses the REST countries API. The country name that
+is returned by this API may not always be the one that the Cases API uses. Therefore, in some cases, the country
+will not be found in the Cases API, even though a valid country code was given. Some examples are the following:
+- Country API: "United States", Cases API: "US"
+- Country API: "South Korea", Cases API: "Korea, South"
+- Country API: "DR Congo", Cases API: "Congo, (Kinshasa)"
+- Country API: "Republic of the Congo", Cases API: "Congo, (Brazzaville)"
+
+#### REST Countries API; Invalid Certificate
+
+In the time of writing (2022-04-07), the REST Countries API seems to have some issues with their TLS certificate, 
+but only of some of their instances. Therefore, there may be some occasions where the program will fail to connect, 
+and therefore give and error message. This usually fixes itself by just trying the request again.
 
 ## Further improvements
 
+### Better test coverage
+
+As of now, the test coverage lies around 80% of the lines in the tested packages. However, there are still some
+packages that are not tested yet. The most important ones would be the db package, webhooks package, and the
+cache package.
+
+Although they are not unit tested, they are indirectly tested through other packages, mainly through the testing of
+the endpoints. Therefore, the main functionality of all packages is tested in varying degrees.
+
+### Secret handling
+
+To be able to hash different IDs for the database, the program uses a secret hash key. This key is now stored in a
+go file, with an accessor function that can be used to get the key. When the project is cloned, you would have to
+rewrite this file (see [hash secret](#hash-secret)). This is done to ensure that the key is not stored in the repository.
+
+### Error responding
+
+When an error occurs in the API, it responds with the correct error message as plain text, which is readable for the user.
+A better alternative could be to return the error message as JSON, to make it more readable for machines.
+
+Example:
+```json
+{
+   "error": "The API responded with an error."
+}
+```
