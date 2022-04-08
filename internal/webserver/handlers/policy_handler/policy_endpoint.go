@@ -42,6 +42,7 @@ func HandlerPolicy(w http.ResponseWriter, r *http.Request) {
 
 	// Defines the different queries in the url
 	countryQuery := path.Base(cleanPath)
+	countryQuery = strings.ToUpper(countryQuery)
 
 	// Invokes the webhook package to see if any webhooks needs to be counted up or needs to be invoked.
 	go webhooks.Invoke(countryQuery)
