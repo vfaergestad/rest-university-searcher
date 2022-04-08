@@ -17,6 +17,10 @@ information about the number of cases in different countries. ([Documentation an
 - The [Rest Countries API](https://restcountries.com/) by [Alejandro Matos](https://gitlab.com/amatos) provides 
 conversion between ISO 3166-1 alpha-3 country codes and country names. ([Documentation and more info](https://gitlab.com/amatos/rest-countries))
 
+Thank you to all developers who develop open source and free to use APIs like these.
+
+## Table of Contents
+
 [TOC]
 
 ## Endpoints
